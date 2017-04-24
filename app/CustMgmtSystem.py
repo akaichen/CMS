@@ -28,7 +28,7 @@ class CustMgmtSystem(wx.Dialog):
         self.SetClientSize(self.mainwin)
 
         self.panel1 = wx.Panel(id=wxID_CUSTMGMTSYSTEMPANEL1, name='panel1',
-              parent=self, pos=wx.Point(8, 8), size=self.mainwin,
+              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
               style=wx.TAB_TRAVERSAL)
 
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
@@ -106,7 +106,7 @@ class CustMgmtSystem(wx.Dialog):
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
 
-    def __init__(self, membertype, custtitle, parent, mainwin, mainpagefile, mainpage, mainpagesize, custpicturefile, imagedir, imginfo, dbname, tablename, warntext):
+    def __init__(self, membertype, custtitle, parent, mainwin, mainpagefile, mainpage, mainpagesize, custpicturefile, imagedir, imginfo, dbname, custtable, warntext):
         self.membertype = membertype
         self.custtitle = custtitle
         self.parent = parent
@@ -118,7 +118,7 @@ class CustMgmtSystem(wx.Dialog):
         self.imagedir = imagedir
         self.imginfo = imginfo
         self.dbname = dbname
-        self.tablename = tablename
+        self.custtable = custtable
         self.warntext = warntext
         self.currentItem = -1
 
@@ -163,7 +163,7 @@ class CustMgmtSystem(wx.Dialog):
         action = 'add'
         dlg = NewCustomerInfo.NewCustomerInfo(self.parent, self.membertype, self.mainwin, self.custtitle, self.mainpagefile, 
                                               self.mainpage, self.mainpagesize, self.custpicturefile, self.currentItem,
-                                              self.imagedir, self.imginfo, self.dbname, self.tablename, self.warntext,
+                                              self.imagedir, self.imginfo, self.dbname, self.custtable, self.warntext,
                                               self.HeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                               action, userinfo)
         dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
@@ -188,7 +188,7 @@ class CustMgmtSystem(wx.Dialog):
             action = 'modify'
             dlg = NewCustomerInfo.NewCustomerInfo(self.parent, self.membertype, self.mainwin, self.custtitle, self.mainpagefile, 
                                                   self.mainpage, self.mainpagesize, self.custpicturefile, self.currentItem,
-                                                  self.imagedir, self.imginfo, self.dbname, self.tablename, self.warntext,
+                                                  self.imagedir, self.imginfo, self.dbname, self.custtable, self.warntext,
                                                   self.HeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                                   action, userinfo)
             dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
@@ -304,12 +304,12 @@ class CustMgmtSystem(wx.Dialog):
         if searchname == '':
             sqlcmd = '''SELECT * FROM %s
                         WHERE Customer_SaleType = '%s'
-                    '''%(self.tablename, membertype)
+                    '''%(self.custtable, membertype)
         elif searchname in range(0, len(self.queryjoblist)):
             searchname = self.queryjoblist[searchname]
             sqlcmd = '''SELECT * FROM %s
                         WHERE Customer_SaleType = '%s' AND Customer_JobLevel = '%s'
-                    '''%(self.tablename, membertype, searchname)
+                    '''%(self.custtable, membertype, searchname)
             #print sqlcmd
         else:
             sqlcmd = '''SELECT * FROM %s
@@ -317,7 +317,7 @@ class CustMgmtSystem(wx.Dialog):
                                 Customer_Name LIKE '%s' OR Customer_JobTitle LIKE '%s'
                                 OR Customer_Telephone LIKE '%s' OR Customer_Cellphone LIKE '%s'
                                 )
-                    '''%(self.tablename, membertype,
+                    '''%(self.custtable, membertype,
                          '%'+searchname+'%', '%'+searchname+'%',
                          '%'+searchname+'%', '%'+searchname+'%')
 
@@ -333,20 +333,6 @@ class CustMgmtSystem(wx.Dialog):
             info = 'error'
         
         return alluserinfo
-
-    def ShowNoItemSelectMessage(self, type):
-        if type == 'MODIFY':
-            msg = u'請先選擇一個用戶進行修改！'
-        elif type == 'QUERYFAILED':
-            msg = u'請輸入搜尋關鍵字！'
-        elif type == 'MOVECUSTOMER':
-            msg = u'請先選擇一個用戶進行轉換！'
-
-        dialog = wx.MessageDialog(self, msg, u'警告', wx.OK | wx.ICON_INFORMATION)
-        dialog.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
-        result = dialog.ShowModal()
-
-        return
 
     def OnQueryJobLevel(self, event):
         searchselect = self.QueryJobLevel.GetSelection()
@@ -371,7 +357,7 @@ class CustMgmtSystem(wx.Dialog):
             action = 'modify'
             dlg = NewCustomerInfo.NewCustomerInfo(self.parent, 'Member', self.mainwin, self.custtitle, self.mainpagefile, 
                                                   self.mainpage, self.mainpagesize, self.custpicturefile, self.currentItem,
-                                                  self.imagedir, self.imginfo, self.dbname, self.tablename, self.warntext,
+                                                  self.imagedir, self.imginfo, self.dbname, self.custtable, self.warntext,
                                                   self.HeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                                   action, userinfo)
             dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
@@ -396,7 +382,7 @@ class CustMgmtSystem(wx.Dialog):
             sqlaction = 'update'
             sqlcmd  = '''UPDATE %s SET Customer_SaleType = 'Member'
                             WHERE Customer_ItemNo = %s 
-                    '''%(self.tablename, userid)
+                    '''%(self.custtable, userid)
 
             try:
                 db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
@@ -412,6 +398,20 @@ class CustMgmtSystem(wx.Dialog):
             self.alluserinfo = self.GetAllUserInfo(self.membertype, searchname)
             #print self.alluserinfo
             self.InitData(self.membertype, self.alluserinfo)
+
+        return
+
+    def ShowNoItemSelectMessage(self, type):
+        if type == 'MODIFY':
+            msg = u'請先選擇一個用戶進行修改！'
+        elif type == 'QUERYFAILED':
+            msg = u'請輸入搜尋關鍵字！'
+        elif type == 'MOVECUSTOMER':
+            msg = u'請先選擇一個用戶進行轉換！'
+
+        dialog = wx.MessageDialog(self, msg, u'警告', wx.OK | wx.ICON_INFORMATION)
+        dialog.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+        result = dialog.ShowModal()
 
         return
 

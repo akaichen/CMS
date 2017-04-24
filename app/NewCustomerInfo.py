@@ -45,7 +45,7 @@ class NewCustomerInfo(wx.Dialog):
         self.SetClientSize(self.mainwin)
 
         self.panel1 = wx.Panel(id=wxID_NEWCUSTOMERINFOPANEL1, name='panel1',
-              parent=self, pos=wx.Point(0, 8), size=self.mainwin,
+              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
               style=wx.TAB_TRAVERSAL)
 
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
@@ -357,7 +357,8 @@ class NewCustomerInfo(wx.Dialog):
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
 
-    def __init__(self, parent, membertype, mainwin, title, mainpagefile, mainpage, mainpagesize, custpicturefile, currentItem, imagedir, imginfo, dbname, tablename, warntext, HeaderList, joblist, yearlist, monthlist, daylist, action, userinfo):
+    def __init__(self, parent, membertype, mainwin, title, mainpagefile, mainpage, mainpagesize, custpicturefile, currentItem, imagedir, imginfo, dbname, custtable, warntext, HeaderList, joblist, yearlist, monthlist, daylist, action, userinfo):
+        self.custpicture = ''
         self.newcustpicture = ''
         self.userid = ''
 
@@ -373,7 +374,7 @@ class NewCustomerInfo(wx.Dialog):
         self.imagedir = imagedir
         self.imginfo = imginfo
         self.dbname = dbname
-        self.tablename = tablename
+        self.custtable = custtable
         self.warntext = warntext
         self.HeaderList = HeaderList
         self.action = action
@@ -384,9 +385,9 @@ class NewCustomerInfo(wx.Dialog):
         self.monthlist = monthlist
         self.daylist = daylist
 
-        self.fgimagefile = self.custpicturefile
         self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                              self.imginfo.GetImageInfo('custpicture', self.fgimagefile)
+                              self.imginfo.GetImageInfo('custpicture', self.custpicturefile)
+        #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.custpicturefile
 
         self._init_ctrls(parent, title, self.joblist, self.yearlist, self.monthlist, self.daylist)
         self.Center()
@@ -417,12 +418,12 @@ class NewCustomerInfo(wx.Dialog):
         if self.action == 'modify' and self.userinfo:
             self.InsertUserInfo(self.userinfo)
             userid = self.userinfo[0]
-            self.fgimagefile = '%s/%s.png'%(self.imagedir, userid)
-            if not path.isfile(self.fgimagefile):
-                self.fgimagefile = self.custpicturefile
-            self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                  self.imginfo.GetImageInfo('custpicture', self.fgimagefile)
-            #print self.fgimagesize
+            self.custpicture = '%s/%s.png'%(self.imagedir, userid)
+            if path.isfile(self.custpicture):
+                self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                                      self.imginfo.GetImageInfo('custpicture', self.custpicture)
+                #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.custpicture
+
         self.CustPicture.SetBitmap(self.fgimage)
 
     def ChkCustTelValue1(self, event):
@@ -477,7 +478,7 @@ class NewCustomerInfo(wx.Dialog):
             self.CustPicture.SetBitmap(wx.NullBitmap)
             self.fgimagefilename, self.fgimage, self.fgimagesize = \
                                   self.imginfo.GetImageInfo('custpicture', self.newcustpicture)
-            #print self.fgimagefilename, self.fgimage, self.fgimagesize
+            #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.newcustpicture
             self.CustPicture.SetBitmap(self.fgimage)
 
         return
@@ -592,7 +593,7 @@ class NewCustomerInfo(wx.Dialog):
         print dealer, joblevel, custname, custspouse, birthday, jobtitle, telephone, cellphone, area, address, email, recommended
         if self.action == 'add':
             sqlaction = 'insert'
-            sqlcmd  = '''INSERT INTO %s '''%(self.tablename, )
+            sqlcmd  = '''INSERT INTO %s '''%(self.custtable, )
             sqlcmd += '''   (
                             Customer_SaleType, Customer_Dealer, Customer_JobLevel,
                             Customer_Name, Customer_Spouse, Customer_Birthday,
@@ -611,7 +612,7 @@ class NewCustomerInfo(wx.Dialog):
             addsqlcmd = ''
         elif self.action == 'modify':
             sqlaction = 'update'
-            sqlcmd  = '''UPDATE %s SET '''%(self.tablename, )
+            sqlcmd  = '''UPDATE %s SET '''%(self.custtable, )
             sqlcmd += '''   
                             Customer_SaleType   ='%s', Customer_Dealer   ='%s',
                             Customer_JobLevel   ='%s', Customer_Name     ='%s',
@@ -629,11 +630,12 @@ class NewCustomerInfo(wx.Dialog):
             info = db.ConnectDB()
         except:
             print 'Insert into database error'
+            print sqlcmd
             info = 'error'
         
         if info != 'error':
             if self.newcustpicture != '':
-                self.newcustpicture = self.imginfo.CopyNewImageFile(self.fgimagefile, self.newcustpicture)
+                self.newcustpicture = self.imginfo.CopyNewImageFile(self.newcustpicture, self.custpicture)
 
         self.Close()
         event.Skip()

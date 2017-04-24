@@ -9,12 +9,16 @@ from tkFileDialog import askopenfilename
 from PIL import Image
 
 class GetImageInfo:
-    def __init__(self, imagedir, picwidth, picheight, maxwidth, maxheight):
-        self.imagedir  = imagedir
-        self.picwidth  = picwidth
-        self.picheight = picheight
-        self.maxwidth  = maxwidth
-        self.maxheight = maxheight
+    #def __init__(self, imagedir, picwidth, picheight, maxwidth, maxheight):
+    def __init__(self, imgdata):
+        self.imgdata    = imgdata
+        self.imagedir   = self.imgdata['IMGDIR']
+        self.maxwidth   = self.imgdata['MAIN']['WIDTH']
+        self.maxheight  = self.imgdata['MAIN']['HEIGHT']
+        self.picwidth   = self.imgdata['CUST']['WIDTH']
+        self.picheight  = self.imgdata['CUST']['HEIGHT']
+        self.prodwidth  = self.imgdata['PROD']['WIDTH']
+        self.prodheight = self.imgdata['PROD']['HEIGHT']
 
     def GetImageInfo(self, imagetype, image_file):
         if imagetype == 'mainpage':
@@ -23,9 +27,12 @@ class GetImageInfo:
         elif imagetype == 'custpicture':
             if image_file == '':
                 image_file = 'custpicture.png'
-        else:
+        elif imagetype == 'prodpicture':
             if image_file == '':
-                image_file = 'mainpage.png'
+                image_file = 'prodpicture.png'
+        #else:
+        #    if image_file == '':
+        #        image_file = 'mainpage.png'
 
         if not os.path.isfile(image_file):
             image_file = '%s\\%s'%(self.imagedir, image_file)
@@ -56,9 +63,12 @@ class GetImageInfo:
         if imagetype in ['', 'mainpage']:
             maxwidth = self.maxwidth
             maxheight = self.maxheight            
-        else:
+        elif imagetype == 'custpicture':
             maxwidth = self.picwidth
             maxheight = self.picheight
+        elif imagetype == 'prodpicture':
+            maxwidth = self.prodwidth
+            maxheight = self.prodheight
 
         #print 'org:  ', imagewidth, imageheight
         #print 'max:  ', maxwidth, maxheight

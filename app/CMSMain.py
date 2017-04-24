@@ -105,16 +105,22 @@ class CMSMainDialog(wx.Dialog):
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
 
-    def __init__(self, parent, workdir, imagedir, dbdir, mainpagefile, csmainpagefile, custpicturefile, picwidth, picheight, dbfilename, tablename, maxwidth, maxheight):
-        self.parent = parent
+    def __init__(self, parent, workdir, dbdata, imgdata):
+        self.parent  = parent
         self.workdir = workdir
-        self.imagedir = imagedir
-        self.dbdir = dbdir
-        self.mainpagefile = mainpagefile
-        self.csmainpagefile = csmainpagefile
-        self.custpicturefile = custpicturefile
-        self.dbfilename = '%s\\%s'%(self.dbdir, dbfilename)
-        self.tablename = tablename
+        self.dbdata  = dbdata
+        self.imgdata = imgdata
+
+        self.dbdir      = self.dbdata['DBDIR']
+        self.dbfilename = self.dbdata['DBNAME']
+        self.custtable  = self.dbdata['CUSTTABLE']
+        self.prodtable  = self.dbdata['PRODTABLE']
+
+        self.imagedir        = self.imgdata['IMGDIR']
+        self.mainpagefile    = self.imgdata['MAIN']['FILENAME']
+        self.csmainpagefile  = self.imgdata['MAIN']['CSFILENAME']
+        self.custpicturefile = self.imgdata['CUST']['FILENAME']
+        self.prodpicturefile = self.imgdata['PROD']['FILENAME']
 
         self.custtitle      = u'會員資料'
         self.noncusttitle   = u'非會員資料'
@@ -132,8 +138,8 @@ class CMSMainDialog(wx.Dialog):
         changelabel    = u'變更底圖'
         self.warntext  = u'軟體版權為 陳智凱 所有，有著作權、侵害必究'
 
-        self.imginfo = GetImageInfo.GetImageInfo(self.imagedir, picwidth, picheight,
-                                                 maxwidth, maxheight)
+        self.imginfo = GetImageInfo.GetImageInfo(self.imgdata)
+            #(self.imagedir, picwidth, picheight, maxwidth, maxheight)
         if path.isfile(self.csmainpagefile):
             self.bgimagefile = self.csmainpagefile
         else:
@@ -165,7 +171,7 @@ class CMSMainDialog(wx.Dialog):
     def OnCustMgmtButton(self, event):
         dlg = CustMgmtSystem.CustMgmtSystem('Member', self.custtitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
                                             self.bgimagesize, self.custpicturefile, self.imagedir, self.imginfo,
-                                            self.dbname, self.tablename, self.warntext)
+                                            self.dbname, self.custtable, self.warntext)
         dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
         try:
             dlg.ShowModal()
@@ -175,7 +181,7 @@ class CMSMainDialog(wx.Dialog):
     def OnNonCustMgmtButton(self, event):
         dlg = CustMgmtSystem.CustMgmtSystem('Nonmember', self.noncusttitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
                                             self.bgimagesize, self.custpicturefile, self.imagedir, self.imginfo,
-                                            self.dbname, self.tablename, self.warntext)
+                                            self.dbname, self.custtable, self.warntext)
         dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
         try:
             dlg.ShowModal()
@@ -184,7 +190,8 @@ class CMSMainDialog(wx.Dialog):
 
     def OnProductMgmtButton(self, event):
         dlg = ProductMgmtSystem.ProductMgmtSystem('All', self.producttitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
-                                                  self.bgimagesize, self.dbname, self.tablename, self.warntext)
+                                                  self.bgimagesize, self.prodpicturefile, self.imagedir, self.imginfo,
+                                                  self.dbname, self.prodtable, self.warntext)
         dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
         try:
             dlg.ShowModal()
@@ -193,7 +200,7 @@ class CMSMainDialog(wx.Dialog):
 
     def OnPurchseMgmtButton(self, event):
         dlg = PurchseMgmtSystem.PurchseMgmtSystem('All', self.purchsetitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
-                                                  self.bgimagesize, self.dbname, self.tablename, self.warntext)
+                                                  self.bgimagesize, self.dbname, self.custtable, self.prodtable, self.warntext)
         dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
         try:
             dlg.ShowModal()

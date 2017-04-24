@@ -6,15 +6,17 @@ import wx.lib.buttons
 
 import GetSysInfo
 import ConnectDB
+import NewProduct
 
 def create(parent):
     return ProductMgmtSystem(parent)
 
 [wxID_PRODUCTMGMTSYSTEM, wxID_PRODUCTMGMTSYSTEMEXITBUTTON, 
- wxID_PRODUCTMGMTSYSTEMCUSTLIST, wxID_PRODUCTMGMTSYSTEMPANEL1,
+ wxID_PRODUCTMGMTSYSTEMPRODLIST, wxID_PRODUCTMGMTSYSTEMPANEL1,
  wxID_BITMAPCMSMAINPAGE, wxID_CMSMAINDIALOGWARNINGTEXT,
- wxID_PRODUCTMGMTSYSTEMNEWPRODUCT, wxID_PRODUCTMGMTSYSTEMMODIFYPRODUCT, 
-] = [wx.NewId() for _init_ctrls in range(8)]
+ wxID_PRODUCTMGMTSYSTEMNEWPRODUCT, wxID_PRODUCTMGMTSYSTEMMODIFYPRODUCT,
+ wxID_PRODUCTMGMTSYSTEMPRODIMAGEBUTTON, 
+] = [wx.NewId() for _init_ctrls in range(9)]
 
 class ProductMgmtSystem(wx.Dialog):
     def _init_ctrls(self, prnt, producttitle):
@@ -26,7 +28,7 @@ class ProductMgmtSystem(wx.Dialog):
         self.SetClientSize(self.mainwin)
 
         self.panel1 = wx.Panel(id=wxID_PRODUCTMGMTSYSTEMPANEL1, name='panel1',
-              parent=self, pos=wx.Point(8, 0), size=self.mainwin,
+              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
               style=wx.TAB_TRAVERSAL)
 
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
@@ -35,23 +37,34 @@ class ProductMgmtSystem(wx.Dialog):
 
         self.NewProduct = wx.lib.buttons.GenButton(id=wxID_PRODUCTMGMTSYSTEMNEWPRODUCT,
               label=u'新增產品組合', name='NewProduct', parent=self.CMSMainPage,
-              pos=wx.Point(20, 10), size=wx.Size(120, 30), style=0)
+              pos=wx.Point(20, 10), size=wx.Size(140, 30), style=0)
         self.NewProduct.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.ModifyProduct = wx.lib.buttons.GenButton(id=wxID_PRODUCTMGMTSYSTEMMODIFYPRODUCT,
               label=u'異動產品組合', name='ModifyProduct', parent=self.CMSMainPage,
-              pos=wx.Point(160, 10), size=wx.Size(120, 30), style=0)
+              pos=wx.Point(180, 10), size=wx.Size(140, 30), style=0)
         self.ModifyProduct.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        custlist_x = self.mainwin[0] - 40
-        custlist_y = self.mainwin[1] - 20 - 40 - 40
-        self.CustList = wx.ListCtrl(id=wxID_PRODUCTMGMTSYSTEMCUSTLIST,
-              name='CustList', parent=self.CMSMainPage, pos=wx.Point(20, 50),
-              size=wx.Size(custlist_x, custlist_y), style=wx.LC_REPORT | wx.SUNKEN_BORDER |
+        prodimage_size_x, prodimage_size_y = self.fgimagesize
+        prodlist_x = self.mainwin[0] - 40 - prodimage_size_x - 20
+        prodlist_y = self.mainwin[1] - 20 - 40 - 40
+        self.ProdList = wx.ListCtrl(id=wxID_PRODUCTMGMTSYSTEMPRODLIST,
+              name='ProdList', parent=self.CMSMainPage, pos=wx.Point(20, 50),
+              size=wx.Size(prodlist_x, prodlist_y), style=wx.LC_REPORT | wx.SUNKEN_BORDER |
               wx.LC_VRULES | wx.LC_HRULES | wx.LC_SINGLE_SEL)
-        self.CustList.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
+        self.ProdList.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL,
+              False, u'新細明體'))
+
+        prodimage_x = self.mainwin[0] - 20 - prodimage_size_x
+        prodimage_y = 50
+        self.ProdImageButton = wx.BitmapButton(bitmap=wx.NullBitmap,
+              id=wxID_PRODUCTMGMTSYSTEMPRODIMAGEBUTTON, name='ProdImageButton',
+              parent=self.CMSMainPage, pos=wx.Point(prodimage_x, prodimage_y),
+              size=wx.Size(prodimage_size_x, prodimage_size_y),
+              style=wx.BU_AUTODRAW)
+        self.ProdImageButton.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         exit_x = self.mainwin[0] / 2 - 40
@@ -72,26 +85,40 @@ class ProductMgmtSystem(wx.Dialog):
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
 
-    def __init__(self, membertype, producttitle, parent, mainwin, mainpagefile, mainpage, mainpagesize, dbname, tablename, warntext):
+    def __init__(self, membertype, producttitle, parent, mainwin, mainpagefile, mainpage, mainpagesize, prodpicturefile, imagedir, imginfo, dbname, prodtable, warntext):
         self.membertype = membertype
+        self.producttitle = producttitle
         self.parent = parent
         self.mainwin = mainwin
         self.mainpagefile = mainpagefile
         self.mainpage = mainpage
         self.mainpagesize = mainpagesize
+        self.prodpicturefile = prodpicturefile
+        self.imagedir = imagedir
+        self.imginfo = imginfo
         self.dbname = dbname
-        self.tablename = tablename
+        self.prodtable = prodtable
         self.warntext = warntext
+
+        self.fgimagefile = self.prodpicturefile
+        self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                              self.imginfo.GetImageInfo('prodpicture', self.fgimagefile)
+        #print self.fgimagefilename, self.fgimage, self.fgimagesize
 
         sysinfo = GetSysInfo.GetSysInfo(self.membertype)
         self.ProductHeaderList, self.ProductHeaderId = sysinfo.GetProductHeaderList()
 
-        self._init_ctrls(parent, producttitle)
+        self._init_ctrls(parent, self.producttitle)
         self.Center()
 
         self.Bind(wx.EVT_BUTTON, self.OnNewProduct,   self.NewProduct)
         self.Bind(wx.EVT_BUTTON, self.OnModifyProduct, self.ModifyProduct)
         self.Bind(wx.EVT_BUTTON, self.OnExitButton,   self.ExitButton)
+        self.Bind(wx.EVT_BUTTON, self.OnProdImageButton, self.ProdImageButton)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelect, self.ProdList)
+        self.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnItemFocus, self.ProdList)
+        self.ProdList.Bind(wx.EVT_LEFT_DCLICK, self.OnDoubleClick)
+        self.ProdList.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.OnRightClick)
         self.SetEscapeId(wxID_PRODUCTMGMTSYSTEMEXITBUTTON)
         #self.ExitButton.SetFocus()
 
@@ -99,13 +126,70 @@ class ProductMgmtSystem(wx.Dialog):
         #print self.allprodinfo
         self.CreatHeader()
         self.InitData(self.membertype, self.allprodinfo)
-        
+
     def OnNewProduct(self, event):
+        prodinfo = []
+        action = 'add'
+        dlg = NewProduct.NewProduct(self.parent, self.producttitle, self.mainwin, self.mainpagefile, 
+                                    self.mainpage, self.mainpagesize, self.imagedir, self.imginfo, 
+                                    self.ProductHeaderList, self.dbname, self.prodtable, self.warntext,
+                                    self.prodpicturefile, action, prodinfo)
+        dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+        try:
+            dlg.ShowModal()
+        finally:
+            dlg.Destroy()
+
+        self.allprodinfo = self.GetAllProductInfo()
+        #print self.allprodinfo
+        self.InitData(self.membertype, self.allprodinfo)
 
         return
 
     def OnModifyProduct(self, event):
+        self.OnItemSelect(self.ProdList)
+        print self.currentItem
+        if self.currentItem == -1:
+            self.ShowNoItemSelectMessage('PRODMODIFY')
+        else:
+            prodinfo = self.allprodinfo[self.currentItem]
+            action = 'modify'
+            dlg = NewProduct.NewProduct(self.parent, self.producttitle, self.mainwin, self.mainpagefile,
+                                        self.mainpage, self.mainpagesize, self.imagedir, self.imginfo,
+                                        self.ProductHeaderList, self.dbname, self.prodtable, self.warntext,
+                                        self.prodpicturefile, action, prodinfo)
+            dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+            try:
+                dlg.ShowModal()
+            finally:
+                dlg.Destroy()
 
+            searchname = self.QueryCustomer.GetValue()
+            self.allprodinfo = self.GetAllProductInfo()
+            #print self.allprodinfo
+            self.InitData(self.membertype, self.allprodinfo)
+
+        return
+
+    def OnItemSelect(self, event):
+        self.currentItem = self.ProdList.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+
+        return
+
+    def OnItemFocus(self, event):
+
+        return
+
+    def OnRightClick(self, event):
+
+        return
+
+    def OnDoubleClick(self, event):
+        self.OnModifyProduct(self.ModifyProduct)
+
+        return
+
+    def OnProdImageButton(self, event):
         return
 
     def OnExitButton(self, event):
@@ -118,7 +202,7 @@ class ProductMgmtSystem(wx.Dialog):
         searchname = ''
         if searchname == '':
             sqlcmd = '''SELECT * FROM %s
-                    '''%(self.tablename)
+                    '''%(self.prodtable)
 
         try:
             db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
@@ -136,9 +220,9 @@ class ProductMgmtSystem(wx.Dialog):
     def CreatHeader(self):
         #print 'Create list header'
         cid = 0
-        for id in range(0, len(self.HeaderList)):
-            if id in self.HeaderId:
-                titlename = self.HeaderList[id]
+        for id in range(0, len(self.ProductHeaderList)):
+            if id in self.ProductHeaderId:
+                titlename = self.ProductHeaderList[id]
                 if id == 0:
                     colwidth = 120
                 elif id == 1:
@@ -155,26 +239,36 @@ class ProductMgmtSystem(wx.Dialog):
                     colwidth = 150
 
                 #print id, titlename, colwidth
-                self.CustList.InsertColumn(cid, titlename, width=colwidth)
+                self.ProdList.InsertColumn(cid, titlename, width=colwidth)
                 cid += 1
 
         return
 
     def InitData(self, membertype, showuserinfo):
         print 'Clean all data'
-        self.CustList.DeleteAllItems()
+        self.ProdList.DeleteAllItems()
 
         if showuserinfo:
             listid = 0
             for userinfo in showuserinfo:
                 cid = 0
-                for id in self.HeaderId:
-                    #print self.HeaderId.index(id), cid
-                    if self.HeaderId.index(id) == 0:
-                        self.CustList.InsertStringItem(listid, '%s'%userinfo[id + 2])
+                for id in self.ProductHeaderId:
+                    #print self.ProductHeaderId.index(id), cid
+                    if self.ProductHeaderId.index(id) == 0:
+                        self.ProdList.InsertStringItem(listid, '%s'%userinfo[id + 1])
                     else:
-                        self.CustList.SetStringItem(listid, cid, '%s'%userinfo[id + 2])
+                        self.ProdList.SetStringItem(listid, cid, '%s'%userinfo[id + 1])
                     cid += 1
                 listid += 1
+        return
+
+    def ShowNoItemSelectMessage(self, type):
+        if type == 'PRODMODIFY':
+            msg = u'請先選擇一個產品進行修改！'
+
+        dialog = wx.MessageDialog(self, msg, u'警告', wx.OK | wx.ICON_INFORMATION)
+        dialog.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+        result = dialog.ShowModal()
+
         return
 

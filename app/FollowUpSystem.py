@@ -22,7 +22,7 @@ class FollowUpSystem(wx.Dialog):
         self.SetClientSize(self.mainwin)
 
         self.panel1 = wx.Panel(id=wxID_FOLLOWUPSYSTEMPANEL1, name='panel1',
-              parent=self, pos=wx.Point(16, 8), size=self.mainwin,
+              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
               style=wx.TAB_TRAVERSAL)
 
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
@@ -34,7 +34,7 @@ class FollowUpSystem(wx.Dialog):
         self.CustList = wx.ListCtrl(id=wxID_FOLLOWUPSYSTEMCUSTLIST,
               name='CustList', parent=self.CMSMainPage, pos=wx.Point(20, 70),
               size=wx.Size(custlist_x, custlist_y), style=wx.LC_ICON)
-        self.CustList.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
+        self.CustList.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
 
         exit_x = self.mainwin[0] / 2 - 40
