@@ -122,9 +122,20 @@ class GetImageInfo:
 
     def CopyNewImageFile(self, orgfilename, newfilename):
         openimage = Image.open(orgfilename)
-        saveimage = openimage.save(newfilename)
+        print str(openimage.format)
+        saveimage = openimage.save(newfilename, 'PNG')
         #newfilename = '%s/aaa.png'%self.imagedir
         #copyfile(filename, newfilename)
         #print u'Copy from %s to %s'%(repr(filename), repr(newfilename))
 
         return newfilename
+
+    def GetCustImageDir(self):
+        custimgdir = self.imgdata['CUST']['CUSTDIR']
+
+        return custimgdir
+
+    def GetProdImageDir(self):
+        prodimgdir = self.imgdata['PROD']['PRODDIR']
+
+        return prodimgdir

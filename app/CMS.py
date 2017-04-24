@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #Boa:App:BoaApp
 
-from os import path
+from os import path, mkdir
 import wx, time
 #import string, re
 #import decimal
@@ -13,14 +13,28 @@ class BoaApp(wx.App):
         self.parent = parent
         self.workdir = '.'
 
+        dbdir = '%s\\dbdir'%self.workdir
+        if not path.isdir(dbdir):
+            mkdir(dbdir)
+
         self.dbdata = {}
-        self.dbdata['DBDIR']     = '%s\\dbdir'%self.workdir
+        self.dbdata['DBDIR']     = dbdir
         self.dbdata['DBNAME']    = '%s\\customerinfo.mdb'%self.dbdata['DBDIR']
         self.dbdata['CUSTTABLE'] = 'CustomerInformation'
         self.dbdata['PRODTABLE'] = 'ProductInformation'
 
+        imgdir = '%s\\imgdir'%self.workdir
+        if not path.isdir(imgdir):
+            mkdir(imgdir)
+        custdir = '%s\\cust'%imgdir
+        if not path.isdir(custdir):
+            mkdir(custdir)
+        proddir = '%s\\prod'%imgdir
+        if not path.isdir(proddir):
+            mkdir(proddir)
+
         self.imgdata = {}
-        self.imgdata['IMGDIR'] = '%s\\imgdir'%self.workdir
+        self.imgdata['IMGDIR'] = imgdir
         self.imgdata['MAIN']               = {}
         self.imgdata['MAIN']['FILENAME']   = '%s\\mainpage.png'%self.imgdata['IMGDIR']
         self.imgdata['MAIN']['WIDTH']      = 1024
@@ -30,10 +44,12 @@ class BoaApp(wx.App):
         self.imgdata['CUST']['FILENAME']   = '%s\\custpicture.png'%self.imgdata['IMGDIR']
         self.imgdata['CUST']['WIDTH']      = 200
         self.imgdata['CUST']['HEIGHT']     = 200
+        self.imgdata['CUST']['CUSTDIR']    = custdir
         self.imgdata['PROD']               = {}
         self.imgdata['PROD']['FILENAME']   = '%s\\prodpicture.png'%self.imgdata['IMGDIR']
         self.imgdata['PROD']['WIDTH']      = 300
         self.imgdata['PROD']['HEIGHT']     = 300
+        self.imgdata['PROD']['PRODDIR']    = proddir
 
         csmainpagefile = self.imgdata['MAIN']['CSFILENAME']
         if path.isfile(csmainpagefile):

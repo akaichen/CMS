@@ -186,7 +186,8 @@ class NewProduct(wx.Dialog):
 
         if self.action == 'modify' and self.prodinfo:
             self.InsertProductInfo(self.prodinfo)
-            prodid = self.prodinfo[0]
+            #prodid = self.prodinfo[0]
+            prodid = self.prodinfo[1]
             self.prodpicture = '%s/%s.png'%(self.imagedir, prodid)
             if path.isfile(self.prodpicture):
                 self.fgimagefilename, self.fgimage, self.fgimagesize = \
@@ -201,7 +202,7 @@ class NewProduct(wx.Dialog):
             self.ProdPicture.SetBitmap(wx.NullBitmap)
             self.fgimagefilename, self.fgimage, self.fgimagesize = \
                                   self.imginfo.GetImageInfo('prodpicture', self.newprodpicture)
-            print self.fgimagefilename, self.fgimage, self.fgimagesize, self.newprodpicture
+            #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.newprodpicture
             self.ProdPicture.SetBitmap(self.fgimage)
 
         return

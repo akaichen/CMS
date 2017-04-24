@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #Boa:Dialog:ProductMgmtSystem
 
+from os import path
 import wx
 import wx.lib.buttons
 
@@ -100,10 +101,10 @@ class ProductMgmtSystem(wx.Dialog):
         self.prodtable = prodtable
         self.warntext = warntext
 
-        self.fgimagefile = self.prodpicturefile
         self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                              self.imginfo.GetImageInfo('prodpicture', self.fgimagefile)
+                              self.imginfo.GetImageInfo('prodpicture', self.prodpicturefile)
         #print self.fgimagefilename, self.fgimage, self.fgimagesize
+        self.prodimgdir = self.imginfo.GetProdImageDir()
 
         sysinfo = GetSysInfo.GetSysInfo(self.membertype)
         self.ProductHeaderList, self.ProductHeaderId = sysinfo.GetProductHeaderList()
@@ -122,6 +123,8 @@ class ProductMgmtSystem(wx.Dialog):
         self.SetEscapeId(wxID_PRODUCTMGMTSYSTEMEXITBUTTON)
         #self.ExitButton.SetFocus()
 
+        self.ProdImageButton.SetBitmap(self.fgimage)
+
         self.allprodinfo = self.GetAllProductInfo()
         #print self.allprodinfo
         self.CreatHeader()
@@ -131,7 +134,7 @@ class ProductMgmtSystem(wx.Dialog):
         prodinfo = []
         action = 'add'
         dlg = NewProduct.NewProduct(self.parent, self.producttitle, self.mainwin, self.mainpagefile, 
-                                    self.mainpage, self.mainpagesize, self.imagedir, self.imginfo, 
+                                    self.mainpage, self.mainpagesize, self.prodimgdir, self.imginfo, 
                                     self.ProductHeaderList, self.dbname, self.prodtable, self.warntext,
                                     self.prodpicturefile, action, prodinfo)
         dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
@@ -155,7 +158,7 @@ class ProductMgmtSystem(wx.Dialog):
             prodinfo = self.allprodinfo[self.currentItem]
             action = 'modify'
             dlg = NewProduct.NewProduct(self.parent, self.producttitle, self.mainwin, self.mainpagefile,
-                                        self.mainpage, self.mainpagesize, self.imagedir, self.imginfo,
+                                        self.mainpage, self.mainpagesize, self.prodimgdir, self.imginfo,
                                         self.ProductHeaderList, self.dbname, self.prodtable, self.warntext,
                                         self.prodpicturefile, action, prodinfo)
             dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
@@ -164,7 +167,6 @@ class ProductMgmtSystem(wx.Dialog):
             finally:
                 dlg.Destroy()
 
-            searchname = self.QueryCustomer.GetValue()
             self.allprodinfo = self.GetAllProductInfo()
             #print self.allprodinfo
             self.InitData(self.membertype, self.allprodinfo)
@@ -173,6 +175,18 @@ class ProductMgmtSystem(wx.Dialog):
 
     def OnItemSelect(self, event):
         self.currentItem = self.ProdList.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+        prodinfo = self.allprodinfo[self.currentItem]
+        prodid = prodinfo[1]
+        prodpicture = '%s/%s.png'%(self.prodimgdir, prodid)
+        if path.isfile(prodpicture):
+            self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                                  self.imginfo.GetImageInfo('prodpicture', prodpicture)
+            #print fgimagefilename, fgimage, fgimagesize, prodpicture
+        else:
+            self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                                  self.imginfo.GetImageInfo('prodpicture', self.prodpicturefile)
+
+        self.ProdImageButton.SetBitmap(self.fgimage)
 
         return
 
@@ -190,6 +204,7 @@ class ProductMgmtSystem(wx.Dialog):
         return
 
     def OnProdImageButton(self, event):
+
         return
 
     def OnExitButton(self, event):

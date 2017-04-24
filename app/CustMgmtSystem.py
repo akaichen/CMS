@@ -122,6 +122,8 @@ class CustMgmtSystem(wx.Dialog):
         self.warntext = warntext
         self.currentItem = -1
 
+        self.custimgdir = self.imginfo.GetCustImageDir()
+
         sysinfo = GetSysInfo.GetSysInfo(self.membertype)
         self.HeaderList, self.HeaderId = sysinfo.GetHeaderList()
         self.joblist, self.queryjoblist = sysinfo.GetJobLevelList()
@@ -163,7 +165,7 @@ class CustMgmtSystem(wx.Dialog):
         action = 'add'
         dlg = NewCustomerInfo.NewCustomerInfo(self.parent, self.membertype, self.mainwin, self.custtitle, self.mainpagefile, 
                                               self.mainpage, self.mainpagesize, self.custpicturefile, self.currentItem,
-                                              self.imagedir, self.imginfo, self.dbname, self.custtable, self.warntext,
+                                              self.custimgdir, self.imginfo, self.dbname, self.custtable, self.warntext,
                                               self.HeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                               action, userinfo)
         dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
@@ -188,7 +190,7 @@ class CustMgmtSystem(wx.Dialog):
             action = 'modify'
             dlg = NewCustomerInfo.NewCustomerInfo(self.parent, self.membertype, self.mainwin, self.custtitle, self.mainpagefile, 
                                                   self.mainpage, self.mainpagesize, self.custpicturefile, self.currentItem,
-                                                  self.imagedir, self.imginfo, self.dbname, self.custtable, self.warntext,
+                                                  self.custimgdir, self.imginfo, self.dbname, self.custtable, self.warntext,
                                                   self.HeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                                   action, userinfo)
             dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
@@ -357,7 +359,7 @@ class CustMgmtSystem(wx.Dialog):
             action = 'modify'
             dlg = NewCustomerInfo.NewCustomerInfo(self.parent, 'Member', self.mainwin, self.custtitle, self.mainpagefile, 
                                                   self.mainpage, self.mainpagesize, self.custpicturefile, self.currentItem,
-                                                  self.imagedir, self.imginfo, self.dbname, self.custtable, self.warntext,
+                                                  self.custimgdir, self.imginfo, self.dbname, self.custtable, self.warntext,
                                                   self.HeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                                   action, userinfo)
             dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
