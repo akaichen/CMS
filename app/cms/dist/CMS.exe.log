@@ -1,9 +1,0 @@
-Traceback (most recent call last):
-  File "CMSMain.pyo", line 191, in OnChangeButton
-  File "GetImageInfo.pyo", line 113, in CopyNewImageFile
-  File "PIL\Image.pyo", line 1406, in save
-  File "PIL\ImageFile.pyo", line 164, in load
-  File "PIL\PngImagePlugin.pyo", line 381, in load_prepare
-  File "PIL\ImageFile.pyo", line 231, in load_prepare
-  File "PIL\Image.pyo", line 37, in __getattr__
-ImportError: The _imaging C module is not installed
