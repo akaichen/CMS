@@ -6,30 +6,70 @@ class GetSysInfo:
     def __init__(self, membertype):
         self.membertype = membertype
 
+    def GetPurchseHeaderList(self):
+        PurchseHeaderList = [u'購買月份', u'月積分',
+                             u'月累加總積分']
+
+        PurchseHeaderId = {}
+        PurchseHeaderId[0] = 100
+        PurchseHeaderId[1] = 100
+        PurchseHeaderId[2] = 100
+
+        return PurchseHeaderList, PurchseHeaderId
+
     def GetProductHeaderList(self):
         ProductHeaderList = [u'產品編號', u'產品名稱',
                              u'產品規格', u'建議售價',
                              u'實際售價']
 
-        ProductHeaderId = [0, 1, 2, 3, 4]
+        ProductHeaderId    = {}
+        ProductHeaderId[0] = 100
+        ProductHeaderId[1] = 200
+        ProductHeaderId[2] = 180
+        ProductHeaderId[3] = 80
+        ProductHeaderId[4] = 80
 
         return ProductHeaderList, ProductHeaderId
 
-    def GetHeaderList(self):
-        HeaderList = [u'經銷商編號', u'職級',
-                      u'姓名', u'配偶', 
-                      u'生日', u'職業',
-                      u'電話[H,O]', u'行動電話',
-                      u'地區', u'地址',
-                      u'e-Mail', u'推薦人']
-        # 職級(上聘年月)
+    def GetCustomerHeaderList(self, gettype):
+        CustomerHeaderList = []
+        CustomerHeaderId = {}
+        if gettype == 'customer':
+            CustomerHeaderList = [u'經銷商編號', u'職級',
+                          u'姓名', u'配偶', 
+                          u'生日', u'職業',
+                          u'電話[H,O]', u'行動電話',
+                          u'地區', u'地址',
+                          u'e-Mail', u'推薦人']
+            # 職級(上聘年月)
 
-        if self.membertype in ['Member', 'All']:
-            HeaderId = [0, 1, 2, 6, 7, 8]
-        elif self.membertype == 'Nonmember':
-            HeaderId = [2, 6, 7, 8]
+            if self.membertype in ['Member', 'All']:
+                CustomerHeaderId[0] = 100
+                CustomerHeaderId[1] = 70
+                CustomerHeaderId[2] = 100
+                CustomerHeaderId[6] = 130
+                CustomerHeaderId[7] = 130
+                CustomerHeaderId[8] = 100
+            elif self.membertype == 'Nonmember':
+                CustomerHeaderId[2] = 100
+                CustomerHeaderId[6] = 130
+                CustomerHeaderId[7] = 130
+                CustomerHeaderId[8] = 100
+        elif gettype == 'purchse':
+            CustomerHeaderList = [u'經銷商編號', u'職級',
+                                  u'姓名', u'配偶',
+                                  u'生日', u'職業',
+                                  u'電話[H,O]', u'行動電話',
+                                  u'地區', u'地址',
+                                  u'e-Mail', u'推薦人']
+            CustomerHeaderId[0] = 100
+            CustomerHeaderId[1] = 70
+            CustomerHeaderId[2] = 100
+            CustomerHeaderId[6] = 130
+            CustomerHeaderId[7] = 130
+            CustomerHeaderId[8] = 100
 
-        return HeaderList, HeaderId
+        return CustomerHeaderList, CustomerHeaderId
 
     def GetJobLevelList(self):
         alljoblist = [u'會員', u'主任',

@@ -2,6 +2,7 @@
 #Boa:Dialog:ProductMgmtSystem
 
 from os import path
+from glob import glob
 import wx
 import wx.lib.buttons
 
@@ -37,23 +38,23 @@ class ProductMgmtSystem(wx.Dialog):
               pos=wx.Point(0, 0), size=self.mainpagesize, style=wx.TAB_TRAVERSAL)
 
         self.NewProduct = wx.lib.buttons.GenButton(id=wxID_PRODUCTMGMTSYSTEMNEWPRODUCT,
-              label=u'新增產品組合', name='NewProduct', parent=self.CMSMainPage,
+              label=self.newprodlabel, name='NewProduct', parent=self.CMSMainPage,
               pos=wx.Point(20, 10), size=wx.Size(140, 30), style=0)
         self.NewProduct.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.ModifyProduct = wx.lib.buttons.GenButton(id=wxID_PRODUCTMGMTSYSTEMMODIFYPRODUCT,
-              label=u'異動產品組合', name='ModifyProduct', parent=self.CMSMainPage,
+              label=self.modprodlabel, name='ModifyProduct', parent=self.CMSMainPage,
               pos=wx.Point(180, 10), size=wx.Size(140, 30), style=0)
         self.ModifyProduct.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         prodimage_size_x, prodimage_size_y = self.fgimagesize
-        prodlist_x = self.mainwin[0] - 40 - prodimage_size_x - 20
-        prodlist_y = self.mainwin[1] - 20 - 40 - 40
+        prodlist_size_x = self.mainwin[0] - 40 - prodimage_size_x - 20
+        prodlist_size_y = self.mainwin[1] - 20 - 40 - 40
         self.ProdList = wx.ListCtrl(id=wxID_PRODUCTMGMTSYSTEMPRODLIST,
               name='ProdList', parent=self.CMSMainPage, pos=wx.Point(20, 50),
-              size=wx.Size(prodlist_x, prodlist_y), style=wx.LC_REPORT | wx.SUNKEN_BORDER |
+              size=wx.Size(prodlist_size_x, prodlist_size_y), style=wx.LC_REPORT | wx.SUNKEN_BORDER |
               wx.LC_VRULES | wx.LC_HRULES | wx.LC_SINGLE_SEL)
         self.ProdList.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
@@ -87,6 +88,9 @@ class ProductMgmtSystem(wx.Dialog):
         self.WarningText.SetForegroundColour((144, 144, 144))
 
     def __init__(self, membertype, producttitle, parent, mainwin, mainpagefile, mainpage, mainpagesize, prodpicturefile, imagedir, imginfo, dbname, prodtable, warntext):
+        self.newprodlabel = u'新增產品'
+        self.modprodlabel = u'異動產品'
+
         self.membertype = membertype
         self.producttitle = producttitle
         self.parent = parent
@@ -133,7 +137,7 @@ class ProductMgmtSystem(wx.Dialog):
     def OnNewProduct(self, event):
         prodinfo = []
         action = 'add'
-        dlg = NewProduct.NewProduct(self.parent, self.producttitle, self.mainwin, self.mainpagefile, 
+        dlg = NewProduct.NewProduct(self.parent, self.newprodlabel, self.mainwin, self.mainpagefile, 
                                     self.mainpage, self.mainpagesize, self.prodimgdir, self.imginfo, 
                                     self.ProductHeaderList, self.dbname, self.prodtable, self.warntext,
                                     self.prodpicturefile, action, prodinfo)
@@ -157,7 +161,7 @@ class ProductMgmtSystem(wx.Dialog):
         else:
             prodinfo = self.allprodinfo[self.currentItem]
             action = 'modify'
-            dlg = NewProduct.NewProduct(self.parent, self.producttitle, self.mainwin, self.mainpagefile,
+            dlg = NewProduct.NewProduct(self.parent, self.modprodlabel, self.mainwin, self.mainpagefile,
                                         self.mainpage, self.mainpagesize, self.prodimgdir, self.imginfo,
                                         self.ProductHeaderList, self.dbname, self.prodtable, self.warntext,
                                         self.prodpicturefile, action, prodinfo)
@@ -175,13 +179,18 @@ class ProductMgmtSystem(wx.Dialog):
 
     def OnItemSelect(self, event):
         self.currentItem = self.ProdList.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+
         prodinfo = self.allprodinfo[self.currentItem]
         prodid = prodinfo[1]
-        prodpicture = '%s/%s.png'%(self.prodimgdir, prodid)
-        if path.isfile(prodpicture):
-            self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                  self.imginfo.GetImageInfo('prodpicture', prodpicture)
-            #print fgimagefilename, fgimage, fgimagesize, prodpicture
+        #prodpicture = '%s/%s.png'%(self.prodimgdir, prodid)
+        listpictures = glob('%s/%s.*'%(self.prodimgdir, prodid))
+        #print self.prodimgdir, listpictures
+        if listpictures:
+            prodpicture = listpictures[0]
+            if path.isfile(prodpicture):
+                self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                                      self.imginfo.GetImageInfo('prodpicture', prodpicture)
+                #print fgimagefilename, fgimage, fgimagesize, prodpicture
         else:
             self.fgimagefilename, self.fgimage, self.fgimagesize = \
                                   self.imginfo.GetImageInfo('prodpicture', self.prodpicturefile)
@@ -236,45 +245,36 @@ class ProductMgmtSystem(wx.Dialog):
         #print 'Create list header'
         cid = 0
         for id in range(0, len(self.ProductHeaderList)):
-            if id in self.ProductHeaderId:
+            hidlist = self.ProductHeaderId.keys()
+            hidlist.sort()
+            if id in hidlist:
                 titlename = self.ProductHeaderList[id]
-                if id == 0:
-                    colwidth = 120
-                elif id == 1:
-                    colwidth = 130
-                elif id == 2:
-                    colwidth = 130
-                elif id == 6:
-                    colwidth = 130
-                elif id == 7:
-                    colwidth = 130
-                elif id == 8:
-                    colwidth = 130
-                else:
-                    colwidth = 150
-
+                colwidth  = self.ProductHeaderId[id]
                 #print id, titlename, colwidth
                 self.ProdList.InsertColumn(cid, titlename, width=colwidth)
                 cid += 1
 
         return
 
-    def InitData(self, membertype, showuserinfo):
-        print 'Clean all data'
+    def InitData(self, membertype, showprodinfo):
+        #print 'Clean all data'
         self.ProdList.DeleteAllItems()
 
-        if showuserinfo:
+        if showprodinfo:
             listid = 0
-            for userinfo in showuserinfo:
+            for prodinfo in showprodinfo:
                 cid = 0
-                for id in self.ProductHeaderId:
-                    #print self.ProductHeaderId.index(id), cid
-                    if self.ProductHeaderId.index(id) == 0:
-                        self.ProdList.InsertStringItem(listid, '%s'%userinfo[id + 1])
+                hidlist = self.ProductHeaderId.keys()
+                hidlist.sort()
+                for id in hidlist:
+                    #print id, cid
+                    if hidlist.index(id) == 0:
+                        self.ProdList.InsertStringItem(listid, u'%s'%prodinfo[id + 1])
                     else:
-                        self.ProdList.SetStringItem(listid, cid, '%s'%userinfo[id + 1])
+                        self.ProdList.SetStringItem(listid, cid, u'%s'%prodinfo[id + 1])
                     cid += 1
                 listid += 1
+
         return
 
     def ShowNoItemSelectMessage(self, type):

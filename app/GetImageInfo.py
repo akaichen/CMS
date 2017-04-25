@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import os, sys
-import string, re
+from os import path
+import re
 import wx
 from Tkinter import Tk
 from tkFileDialog import askopenfilename
@@ -34,9 +34,9 @@ class GetImageInfo:
         #    if image_file == '':
         #        image_file = 'mainpage.png'
 
-        if not os.path.isfile(image_file):
+        if not path.isfile(image_file):
             image_file = '%s\\%s'%(self.imagedir, image_file)
-        if not os.path.isfile(image_file):
+        if not path.isfile(image_file):
             image_file = '..\\windows_dll\\%s'%image_file
 
         openimage, imagefile, imagesize = self.ImageInfo(imagetype, image_file)
@@ -112,8 +112,8 @@ class GetImageInfo:
         # show an "Open" dialog box and return the path to the selected file
         Tk().withdraw()
         selectfilename = askopenfilename(initialdir = self.imagedir, title = "Select Picture",
-                                   filetypes = (("PNG files", "*.png"),
-                                                ("JPEG files", "*.jpg"),
+                                   filetypes = (("JPEG files", "*.jpg"),
+                                                ("PNG files", "*.png"),
                                                 ("All files", "*.*"))
                                    )
         #print selectfilename
@@ -122,8 +122,12 @@ class GetImageInfo:
 
     def CopyNewImageFile(self, orgfilename, newfilename):
         openimage = Image.open(orgfilename)
-        print str(openimage.format)
-        saveimage = openimage.save(newfilename, 'PNG')
+        filename, fileext = path.splitext(orgfilename)
+        newfilename, newfileext = path.splitext(newfilename)
+        print filename, fileext, newfilename, newfileext
+        savefilename = '%s%s'%(newfilename, fileext)
+        saveimage = openimage.save(savefilename)
+        #saveimage = openimage.save(newfilename, 'PNG')
         #newfilename = '%s/aaa.png'%self.imagedir
         #copyfile(filename, newfilename)
         #print u'Copy from %s to %s'%(repr(filename), repr(newfilename))

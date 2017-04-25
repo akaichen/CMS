@@ -29,11 +29,11 @@ class FollowUpSystem(wx.Dialog):
               id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self.panel1,
               pos=wx.Point(0, 0), size=self.mainpagesize, style=wx.TAB_TRAVERSAL)
 
-        custlist_x = self.mainwin[0] - 40
-        custlist_y = self.mainwin[1] - 40 - 50 - 50
+        custlist_size_x = self.mainwin[0] - 40
+        custlist_size_y = self.mainwin[1] - 40 - 50 - 50
         self.CustList = wx.ListCtrl(id=wxID_FOLLOWUPSYSTEMCUSTLIST,
               name='CustList', parent=self.CMSMainPage, pos=wx.Point(20, 70),
-              size=wx.Size(custlist_x, custlist_y), style=wx.LC_ICON)
+              size=wx.Size(custlist_size_x, custlist_size_y), style=wx.LC_ICON)
         self.CustList.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
 
@@ -55,18 +55,24 @@ class FollowUpSystem(wx.Dialog):
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
 
-    def __init__(self, followtitle, parent, mainwin, mainpagefile, mainpage, mainpagesize, warntext):
+    def __init__(self, followtitle, parent, mainwin, mainpagefile, mainpage, mainpagesize, imagedir, imginfo, warntext):
         self.parent = parent
         self.mainwin = mainwin
         self.mainpagefile = mainpagefile
         self.mainpage = mainpage
         self.mainpagesize = mainpagesize
+        self.imagedir = imagedir
+        self.imginfo = imginfo
         self.warntext = warntext
 
         self._init_ctrls(parent, followtitle)
         self.Center()
 
         self.Bind(wx.EVT_BUTTON, self.OnExitButton,        self.ExitButton)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelect, self.CustList)
+        self.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnItemFocus, self.CustList)
+        self.CustList.Bind(wx.EVT_LEFT_DCLICK, self.OnDoubleClick)
+        self.CustList.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.OnRightClick)
         self.SetEscapeId(wxID_FOLLOWUPSYSTEMEXITBUTTON)
         #self.ExitButton.SetFocus()
 

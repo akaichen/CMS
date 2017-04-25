@@ -115,6 +115,7 @@ class CMSMainDialog(wx.Dialog):
         self.dbfilename = self.dbdata['DBNAME']
         self.custtable  = self.dbdata['CUSTTABLE']
         self.prodtable  = self.dbdata['PRODTABLE']
+        self.saletable  = self.dbdata['SALETABLE']
 
         self.imagedir        = self.imgdata['IMGDIR']
         self.mainpagefile    = self.imgdata['MAIN']['FILENAME']
@@ -124,8 +125,8 @@ class CMSMainDialog(wx.Dialog):
 
         self.custtitle      = u'會員資料'
         self.noncusttitle   = u'非會員資料'
-        self.producttitle   = u'產品組合維護'
-        self.purchsetitle   = u'產品購買及消費查詢'
+        self.producttitle   = u'產品維護'
+        self.purchsetitle   = u'產品訂購及消費積分查詢'
         self.followtitle    = u'跟進內容'
 
         maintitle      = u'客戶資料管理系統'
@@ -200,7 +201,8 @@ class CMSMainDialog(wx.Dialog):
 
     def OnPurchseMgmtButton(self, event):
         dlg = PurchseMgmtSystem.PurchseMgmtSystem('All', self.purchsetitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
-                                                  self.bgimagesize, self.dbname, self.custtable, self.prodtable, self.warntext)
+                                                  self.bgimagesize, self.prodpicturefile, self.imagedir, self.imginfo,
+                                                  self.dbname, self.custtable, self.prodtable, self.saletable, self.warntext)
         dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
         try:
             dlg.ShowModal()
@@ -209,7 +211,8 @@ class CMSMainDialog(wx.Dialog):
 
     def OnFollowUpButton(self, event):
         dlg = FollowUpSystem.FollowUpSystem(self.followtitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
-                                            self.bgimagesize, self.warntext)
+                                            self.bgimagesize, self.imagedir, self.imginfo,
+                                            self.warntext)
         dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
         try:
             dlg.ShowModal()

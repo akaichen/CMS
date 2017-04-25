@@ -2,6 +2,7 @@
 #Boa:Dialog:NewProduct
 
 from os import path
+from glob import glob
 import wx
 
 import ConnectDB
@@ -186,13 +187,18 @@ class NewProduct(wx.Dialog):
 
         if self.action == 'modify' and self.prodinfo:
             self.InsertProductInfo(self.prodinfo)
-            #prodid = self.prodinfo[0]
             prodid = self.prodinfo[1]
-            self.prodpicture = '%s/%s.png'%(self.imagedir, prodid)
-            if path.isfile(self.prodpicture):
-                self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                      self.imginfo.GetImageInfo('prodpicture', self.prodpicture)
-            #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.prodpicture
+            #self.prodpicture = '%s/%s.png'%(self.imagedir, prodid)
+            listpictures = glob('%s/%s.*'%(self.imagedir, prodid))
+            #print self.prodimgdir, listpictures
+            if listpictures:
+                self.prodpicture = listpictures[0]
+                if path.isfile(self.prodpicture):
+                    self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                                          self.imginfo.GetImageInfo('prodpicture', self.prodpicture)
+                    #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.prodpicture
+            else:
+                self.prodpicture = '%s/%s.png'%(self.imagedir, prodid)
 
         self.ProdPicture.SetBitmap(self.fgimage)
 
@@ -260,6 +266,13 @@ class NewProduct(wx.Dialog):
 
         if info != 'error':
             if self.newprodpicture != '':
+                if self.prodpicture == '':
+                    prodid = self.GetNewProdId()
+                    if prodid != '':
+                        self.prodpicture = '%s/%s.png'%(self.imagedir, prodid)
+                    else:
+                        self.prodpicture = self.prodpicturefile
+                #print self.newprodpicture, self.prodpicture
                 self.newprodpicture = self.imginfo.CopyNewImageFile(self.newprodpicture, self.prodpicture)
 
         self.Close()
@@ -269,4 +282,24 @@ class NewProduct(wx.Dialog):
         self.Close()
         event.Skip()
 
+    def GetNewProdId(self):
+        prodid = ''
+
+        sqlaction = 'select'
+        sqlcmd  = '''SELECT TOP 1 Product_ItemNo
+                        FROM %s
+                        ORDER BY Product_ItemNo DESC;
+                '''%(self.prodtable, )
+
+        try:
+            db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
+            info = db.ConnectDB()
+            if info:
+                prodid = info[0]
+            print info, prodid
+        except:
+            print 'Insert into database error'
+            print sqlcmd
+
+        return prodid
 

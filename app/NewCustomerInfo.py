@@ -2,7 +2,7 @@
 #Boa:Dialog:NewCustomerInfo
 
 from os import path
-import sys
+from glob import glob
 import string, re
 import wx
 
@@ -64,7 +64,7 @@ class NewCustomerInfo(wx.Dialog):
 
         split_x_1 = 20
         col2_extend = 150
-        dealerlabel = u'%s：'%self.HeaderList[0]
+        dealerlabel = u'%s：'%self.CustomerHeaderList[0]
         self.DealerHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFODEALERHEADER,
               label=dealerlabel, name='DealerHeader',
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 80), size=wx.Size(140, 25),
@@ -86,7 +86,7 @@ class NewCustomerInfo(wx.Dialog):
               pos=wx.Point(custpicture_x, custpicture_y), size=self.fgimagesize, 
               style=wx.BU_AUTODRAW)
 
-        joblevellabel = u'%s：'%self.HeaderList[1]
+        joblevellabel = u'%s：'%self.CustomerHeaderList[1]
         self.JobLevelHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFOJOBLEVELHEADER,
               label=joblevellabel, name='JobLevelHeader',
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 120), size=wx.Size(140, 25),
@@ -101,7 +101,7 @@ class NewCustomerInfo(wx.Dialog):
         self.JobLevelText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        namelabel = u'%s：'%self.HeaderList[2]
+        namelabel = u'%s：'%self.CustomerHeaderList[2]
         self.NameHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFONAMEHEADER,
               label=namelabel, name='NameHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 160), size=wx.Size(140, 25),
@@ -115,7 +115,7 @@ class NewCustomerInfo(wx.Dialog):
         self.NameText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        spouselabel = u'%s：'%self.HeaderList[3]
+        spouselabel = u'%s：'%self.CustomerHeaderList[3]
         self.SpouseHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFOSPOUSEHEADER,
               label=spouselabel, name='SpouseHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 200), size=wx.Size(140, 25),
@@ -129,7 +129,7 @@ class NewCustomerInfo(wx.Dialog):
         self.SpouseText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        birthdaylabel = u'%s：'%self.HeaderList[4]
+        birthdaylabel = u'%s：'%self.CustomerHeaderList[4]
         self.BirthdayHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFOBIRTHDAYHEADER,
               label=birthdaylabel, name='BirthdayHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 240), size=wx.Size(140, 25),
@@ -185,7 +185,7 @@ class NewCustomerInfo(wx.Dialog):
         self.BirthdayDayHeader.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        jobtitlelabel = u'%s：'%self.HeaderList[5]
+        jobtitlelabel = u'%s：'%self.CustomerHeaderList[5]
         self.JobtitleHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFOJOBTITLEHEADER,
               label=jobtitlelabel, name='JobtitleHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 280), size=wx.Size(140, 25),
@@ -199,7 +199,7 @@ class NewCustomerInfo(wx.Dialog):
         self.JobtitleText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        tellabel = u'%s：'%self.HeaderList[6]
+        tellabel = u'%s：'%self.CustomerHeaderList[6]
         self.TelephoneHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFOTELEPHONEHEADER,
               label=tellabel, name='TelephoneHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 320), size=wx.Size(140, 25),
@@ -244,7 +244,7 @@ class NewCustomerInfo(wx.Dialog):
         self.TelephoneText3.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        celllabel = u'%s：'%self.HeaderList[7]
+        celllabel = u'%s：'%self.CustomerHeaderList[7]
         self.CellphoneHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFOCELLPHONEHEADER,
               label=celllabel, name='CellphoneHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 360), size=wx.Size(140, 25),
@@ -274,7 +274,7 @@ class NewCustomerInfo(wx.Dialog):
         self.CellphoneText2.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        arealabel = u'%s：'%self.HeaderList[8]
+        arealabel = u'%s：'%self.CustomerHeaderList[8]
         self.AreaHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFOAREAHEADER,
               label=arealabel, name='AreaHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 400), size=wx.Size(140, 25),
@@ -288,7 +288,7 @@ class NewCustomerInfo(wx.Dialog):
         self.AreaText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        addresslabel = u'%s：'%self.HeaderList[9]
+        addresslabel = u'%s：'%self.CustomerHeaderList[9]
         self.AddressHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFOADDRESSHEADER,
               label=addresslabel, name='AddressHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 440), size=wx.Size(140, 25),
@@ -304,7 +304,7 @@ class NewCustomerInfo(wx.Dialog):
         self.AddressText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        maillabel = u'%s：'%self.HeaderList[10]
+        maillabel = u'%s：'%self.CustomerHeaderList[10]
         self.MailHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFOMAILHEADER,
               label=maillabel, name='MailHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 480), size=wx.Size(140, 25),
@@ -318,7 +318,7 @@ class NewCustomerInfo(wx.Dialog):
         self.MailText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
-        recommendedlabel = u'%s：'%self.HeaderList[11]
+        recommendedlabel = u'%s：'%self.CustomerHeaderList[11]
         self.RecommendedHeader = wx.StaticText(id=wxID_NEWCUSTOMERINFORECOMMENDEDHEADER,
               label=recommendedlabel, name='RecommendedHeader', 
               parent=self.CMSMainPage, pos=wx.Point(split_x_1, 520), size=wx.Size(140, 25),
@@ -357,7 +357,7 @@ class NewCustomerInfo(wx.Dialog):
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
 
-    def __init__(self, parent, membertype, mainwin, title, mainpagefile, mainpage, mainpagesize, custpicturefile, currentItem, imagedir, imginfo, dbname, custtable, warntext, HeaderList, joblist, yearlist, monthlist, daylist, action, userinfo):
+    def __init__(self, parent, membertype, mainwin, title, mainpagefile, mainpage, mainpagesize, custpicturefile, currentItem, imagedir, imginfo, dbname, custtable, warntext, CustomerHeaderList, joblist, yearlist, monthlist, daylist, action, userinfo):
         self.custpicture = ''
         self.newcustpicture = ''
         self.userid = ''
@@ -376,7 +376,7 @@ class NewCustomerInfo(wx.Dialog):
         self.dbname = dbname
         self.custtable = custtable
         self.warntext = warntext
-        self.HeaderList = HeaderList
+        self.CustomerHeaderList = CustomerHeaderList
         self.action = action
         self.userinfo = userinfo
 
@@ -417,12 +417,16 @@ class NewCustomerInfo(wx.Dialog):
 
         if self.action == 'modify' and self.userinfo:
             self.InsertUserInfo(self.userinfo)
-            userid = self.userinfo[0]
-            self.custpicture = '%s/%s.png'%(self.imagedir, userid)
-            if path.isfile(self.custpicture):
-                self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                      self.imginfo.GetImageInfo('custpicture', self.custpicture)
-                #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.custpicture
+            userid = string.zfill(self.userinfo[0], 6)
+            listpictures = glob('%s/%s.*'%(self.imagedir, userid))
+            if listpictures:
+                self.custpicture = listpictures[0]
+                if path.isfile(self.custpicture):
+                    self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                                          self.imginfo.GetImageInfo('custpicture', self.custpicture)
+                    #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.custpicture
+            else:
+                self.custpicture = '%s/%s.png'%(self.imagedir, userid)
 
         self.CustPicture.SetBitmap(self.fgimage)
 
@@ -635,6 +639,13 @@ class NewCustomerInfo(wx.Dialog):
         
         if info != 'error':
             if self.newcustpicture != '':
+                if self.custpicture == '':
+                    userid = self.GetNewUserId()
+                    if userid != '':
+                        self.custpicture = '%s/%s.png'%(self.imagedir, userid)
+                    else:
+                        self.custpicture = self.custpicturefile
+                #print self.newcustpicture, self.custpicture
                 self.newcustpicture = self.imginfo.CopyNewImageFile(self.newcustpicture, self.custpicture)
 
         self.Close()
@@ -644,3 +655,23 @@ class NewCustomerInfo(wx.Dialog):
         self.Close()
         event.Skip()
 
+    def GetNewUserId(self):
+        userid = ''
+
+        sqlaction = 'select'
+        sqlcmd  = '''SELECT TOP 1 Customer_ItemNo
+                        FROM %s
+                        ORDER BY Customer_ItemNo DESC;
+                '''%(self.custtable, )
+
+        try:
+            db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
+            info = db.ConnectDB()
+            if info:
+                userid = info[0]
+            print info, userid
+        except:
+            print 'Insert into database error'
+            print sqlcmd
+
+        return userid

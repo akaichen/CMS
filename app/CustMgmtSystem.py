@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 #Boa:Dialog:CustMgmtSystem
 
+from os import path
+from glob import glob
+import string
 import wx
 import wx.lib.buttons
 
@@ -15,8 +18,9 @@ def create(parent):
  wxID_CUSTMGMTSYSTEMNEWCUSTOMER, wxID_CUSTMGMTSYSTEMMODIFYCUSTOMER, 
  wxID_CUSTMGMTSYSTEMGENQUERYCUSTOMER, wxID_CUSTMGMTSYSTEMCUSTLIST, 
  wxID_CUSTMGMTSYSTEMPANEL1, wxID_BITMAPCMSMAINPAGE,
- wxID_CMSMAINDIALOGWARNINGTEXT, wxID_CUSTMGMTSYSTEMQUERYJOBLEVEL, 
-] = [wx.NewId() for _init_ctrls in range(10)]
+ wxID_CMSMAINDIALOGWARNINGTEXT, wxID_CUSTMGMTSYSTEMQUERYJOBLEVEL,
+ wxID_CUSTMGMTSYSTEMCUSTIMAGEBUTTON, 
+] = [wx.NewId() for _init_ctrls in range(11)]
 
 class CustMgmtSystem(wx.Dialog):
     def _init_ctrls(self, prnt, queryjoblist):
@@ -79,13 +83,24 @@ class CustMgmtSystem(wx.Dialog):
         self.QueryCustomer.ShowSearchButton(True)
         self.QueryCustomer.ShowCancelButton(True)
 
-        custlist_x = self.mainwin[0] - 40
-        custlist_y = self.mainwin[1] - 20 - 40 - 40
+        custimage_size_x, custimage_size_y = self.fgimagesize
+        custlist_size_x = self.mainwin[0] - 40 - custimage_size_x - 20
+        custlist_size_y = self.mainwin[1] - 20 - 40 - 40
         self.CustList = wx.ListCtrl(id=wxID_CUSTMGMTSYSTEMCUSTLIST,
               name='CustList', parent=self.CMSMainPage, pos=wx.Point(20, 50),
-              size=wx.Size(custlist_x, custlist_y), style=wx.LC_REPORT | wx.SUNKEN_BORDER |
+              size=wx.Size(custlist_size_x, custlist_size_y), style=wx.LC_REPORT | wx.SUNKEN_BORDER |
               wx.LC_VRULES | wx.LC_HRULES | wx.LC_SINGLE_SEL)
         self.CustList.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL,
+              False, u'新細明體'))
+
+        custimage_x = self.mainwin[0] - 20 - custimage_size_x
+        custimage_y = 50
+        self.CustImageButton = wx.BitmapButton(bitmap=wx.NullBitmap,
+              id=wxID_CUSTMGMTSYSTEMCUSTIMAGEBUTTON, name='CustImageButton',
+              parent=self.CMSMainPage, pos=wx.Point(custimage_x, custimage_y),
+              size=wx.Size(custimage_size_x, custimage_size_y),
+              style=wx.BU_AUTODRAW)
+        self.CustImageButton.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         exit_x = self.mainwin[0] / 2 - 40
@@ -122,10 +137,13 @@ class CustMgmtSystem(wx.Dialog):
         self.warntext = warntext
         self.currentItem = -1
 
+        self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                              self.imginfo.GetImageInfo('custpicture', self.custpicturefile)
+        #print self.fgimagefilename, self.fgimage, self.fgimagesize
         self.custimgdir = self.imginfo.GetCustImageDir()
 
         sysinfo = GetSysInfo.GetSysInfo(self.membertype)
-        self.HeaderList, self.HeaderId = sysinfo.GetHeaderList()
+        self.CustomerHeaderList, self.CustomerHeaderId = sysinfo.GetCustomerHeaderList('customer')
         self.joblist, self.queryjoblist = sysinfo.GetJobLevelList()
         self.yearlist, self.monthlist, self.daylist = sysinfo.GetDateList()
 
@@ -136,15 +154,16 @@ class CustMgmtSystem(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnModifyCustomer, self.ModifyCustomer)
         self.Bind(wx.EVT_BUTTON, self.OnQueryCustomer,  self.QueryCustomer)
         self.Bind(wx.EVT_BUTTON, self.OnExitButton,     self.ExitButton)
+        self.Bind(wx.EVT_BUTTON, self.OnCustImageButton, self.CustImageButton)
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelect, self.CustList)
         self.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnItemFocus, self.CustList)
+        self.CustList.Bind(wx.EVT_LEFT_DCLICK, self.OnDoubleClick)
+        self.CustList.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.OnRightClick)
         #self.QueryCustomer.Bind(wx.EVT_TEXT, self.OnQueryCustomer)
         self.QueryCustomer.Bind(wx.EVT_TEXT_ENTER, self.OnQueryCustomer)
         self.QueryCustomer.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.OnQueryCustomer)
         self.QueryCustomer.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.OnQueryCustomerBTN)
         self.QueryCustomer.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.OnQueryCustomerCTN)
-        self.CustList.Bind(wx.EVT_LEFT_DCLICK, self.OnDoubleClick)
-        self.CustList.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.OnRightClick)
         self.SetEscapeId(wxID_CUSTMGMTSYSTEMEXITBUTTON)
         self.NewCustomer.SetFocus()
 
@@ -155,6 +174,9 @@ class CustMgmtSystem(wx.Dialog):
         elif self.membertype == 'Nonmember':
             self.Bind(wx.EVT_BUTTON, self.OnMoveCustomer, self.QueryJobLevel)
             #self.QueryJobLevel.Hide()
+
+        self.CustImageButton.SetBitmap(self.fgimage)
+
         self.alluserinfo = self.GetAllUserInfo(self.membertype, '')
         #print self.alluserinfo
         self.CreatHeader()
@@ -166,7 +188,7 @@ class CustMgmtSystem(wx.Dialog):
         dlg = NewCustomerInfo.NewCustomerInfo(self.parent, self.membertype, self.mainwin, self.custtitle, self.mainpagefile, 
                                               self.mainpage, self.mainpagesize, self.custpicturefile, self.currentItem,
                                               self.custimgdir, self.imginfo, self.dbname, self.custtable, self.warntext,
-                                              self.HeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
+                                              self.CustomerHeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                               action, userinfo)
         dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
         try:
@@ -182,7 +204,7 @@ class CustMgmtSystem(wx.Dialog):
 
     def OnModifyCustomer(self, event):
         self.OnItemSelect(self.CustList)
-        print self.currentItem
+        #print self.currentItem
         if self.currentItem == -1:
             self.ShowNoItemSelectMessage('MODIFY')
         else:
@@ -191,7 +213,7 @@ class CustMgmtSystem(wx.Dialog):
             dlg = NewCustomerInfo.NewCustomerInfo(self.parent, self.membertype, self.mainwin, self.custtitle, self.mainpagefile, 
                                                   self.mainpage, self.mainpagesize, self.custpicturefile, self.currentItem,
                                                   self.custimgdir, self.imginfo, self.dbname, self.custtable, self.warntext,
-                                                  self.HeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
+                                                  self.CustomerHeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                                   action, userinfo)
             dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
             try:
@@ -207,7 +229,7 @@ class CustMgmtSystem(wx.Dialog):
         return
 
     def OnQueryCustomer(self, event):
-        print 'Query Customer'
+        #print 'Query Customer'
         searchname = self.QueryCustomer.GetValue()
         if searchname == '':
             self.ShowNoItemSelectMessage('QUERYFAILED')
@@ -219,13 +241,13 @@ class CustMgmtSystem(wx.Dialog):
         return
 
     def OnQueryCustomerBTN(self, event):
-        print 'On query click'
+        #print 'On query click'
         self.OnQueryCustomer(self.QueryCustomer)
 
         return
 
     def OnQueryCustomerCTN(self, event):
-        print 'Clear search string'
+        #print 'Clear search string'
         self.QueryCustomer.Clear()
         self.alluserinfo = self.GetAllUserInfo(self.membertype, '')
         # print self.alluserinfo
@@ -239,6 +261,23 @@ class CustMgmtSystem(wx.Dialog):
 
     def OnItemSelect(self, event):
         self.currentItem = self.CustList.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+
+        userinfo = self.alluserinfo[self.currentItem]
+        custid = string.zfill(userinfo[0], 6)
+        #userpicture = '%s/%s.png'%(self.custimgdir, custid)
+        listpictures = glob('%s/%s.*'%(self.custimgdir, custid))
+        print userinfo, custid, self.custimgdir, listpictures
+        if listpictures:
+            custpicture = listpictures[0]
+            if path.isfile(custpicture):
+                self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                                      self.imginfo.GetImageInfo('custpicture', custpicture)
+                #print fgimagefilename, fgimage, fgimagesize, custpicture
+        else:
+            self.fgimagefilename, self.fgimage, self.fgimagesize = \
+                                  self.imginfo.GetImageInfo('custpicture', self.custpicturefile)
+
+        self.CustImageButton.SetBitmap(self.fgimage)
 
         return
 
@@ -255,48 +294,45 @@ class CustMgmtSystem(wx.Dialog):
 
         return
 
-    def InitData(self, membertype, showuserinfo):
-        print 'Clean all data'
-        self.CustList.DeleteAllItems()
+    def OnCustImageButton(self, event):
 
-        if showuserinfo:
-            listid = 0
-            for userinfo in showuserinfo:
-                cid = 0
-                for id in self.HeaderId:
-                    #print self.HeaderId.index(id), cid
-                    if self.HeaderId.index(id) == 0:
-                        self.CustList.InsertStringItem(listid, '%s'%userinfo[id + 2])
-                    else:
-                        self.CustList.SetStringItem(listid, cid, '%s'%userinfo[id + 2])
-                    cid += 1
-                listid += 1
         return
 
     def CreatHeader(self):
         #print 'Create list header'
         cid = 0
-        for id in range(0, len(self.HeaderList)):
-            if id in self.HeaderId:
-                titlename = self.HeaderList[id]
-                if id == 0:
-                    colwidth = 120
-                elif id == 1:
-                    colwidth = 130
-                elif id == 2:
-                    colwidth = 130
-                elif id == 6:
-                    colwidth = 130
-                elif id == 7:
-                    colwidth = 130
-                elif id == 8:
-                    colwidth = 130
-                else:
-                    colwidth = 150
-
+        for id in range(0, len(self.CustomerHeaderList)):
+            hidlist = self.CustomerHeaderId.keys()
+            hidlist.sort()
+            if id in hidlist:
+                titlename = self.CustomerHeaderList[id]
+                colwidth  = self.CustomerHeaderId[id]
                 #print id, titlename, colwidth
                 self.CustList.InsertColumn(cid, titlename, width=colwidth)
                 cid += 1
+
+        return
+
+    def InitData(self, membertype, showuserinfo):
+        #print 'Clean all data'
+        self.CustList.DeleteAllItems()
+
+        if showuserinfo:
+            listid = 0
+            for userinfo in showuserinfo:
+                #print userinfo
+                cid = 0
+                hidlist = self.CustomerHeaderId.keys()
+                hidlist.sort()
+                #print hidlist
+                for id in hidlist:
+                    #print listid, id, cid, userinfo[id + 2]
+                    if hidlist.index(id) == 0:
+                        self.CustList.InsertStringItem(listid, u'%s'%userinfo[id + 2])
+                    else:
+                        self.CustList.SetStringItem(listid, cid, u'%s'%userinfo[id + 2])
+                    cid += 1
+                listid += 1
 
         return
 
@@ -351,7 +387,7 @@ class CustMgmtSystem(wx.Dialog):
 
     def OnMoveCustomer(self, event):
         self.OnItemSelect(self.CustList)
-        print self.currentItem
+        #print self.currentItem
         if self.currentItem == -1:
             self.ShowNoItemSelectMessage('MODIFY')
         else:
@@ -360,7 +396,7 @@ class CustMgmtSystem(wx.Dialog):
             dlg = NewCustomerInfo.NewCustomerInfo(self.parent, 'Member', self.mainwin, self.custtitle, self.mainpagefile, 
                                                   self.mainpage, self.mainpagesize, self.custpicturefile, self.currentItem,
                                                   self.custimgdir, self.imginfo, self.dbname, self.custtable, self.warntext,
-                                                  self.HeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
+                                                  self.CustomerHeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                                   action, userinfo)
             dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
             try:
