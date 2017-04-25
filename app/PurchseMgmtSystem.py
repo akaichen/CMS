@@ -229,9 +229,12 @@ class PurchseMgmtSystem(wx.Dialog):
                         FROM %s
                     '''%(self.prodtable)
         elif gettype == 'purchse':
-            sqlcmd = '''SELECT * FROM %s
-                        WHERE Sale_CustomerId = '%s'
-                    '''%(self.saletable, userid)
+            sqlcmd = '''SELECT Sale_CustomerId, FORMAT(Sale_PurchseTime, 'yyyy-mm') AS PurchseTime,
+                                SUM(Sale_TotalPrice)
+                        FROM %s
+                        WHERE Sale_CustomerId = %s
+                        GROUP BY Sale_CustomerId, FORMAT(Sale_PurchseTime, 'yyyy-mm')
+                    '''%(self.saletable, int(userid))
 
         try:
             db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)

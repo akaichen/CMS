@@ -80,3 +80,19 @@ class FollowUpSystem(wx.Dialog):
         self.Close()
         event.Skip()
 
+    def OnItemSelect(self, event):
+
+        return
+
+    def OnItemFocus(self, event):
+
+        return
+
+    def OnDoubleClick(self, event):
+
+        return
+
+    def OnRightClick(self, event):
+
+        return
+

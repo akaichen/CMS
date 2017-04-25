@@ -263,10 +263,10 @@ class CustMgmtSystem(wx.Dialog):
         self.currentItem = self.CustList.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 
         userinfo = self.alluserinfo[self.currentItem]
-        custid = string.zfill(userinfo[0], 6)
-        #userpicture = '%s/%s.png'%(self.custimgdir, custid)
-        listpictures = glob('%s/%s.*'%(self.custimgdir, custid))
-        print userinfo, custid, self.custimgdir, listpictures
+        userid_pic = string.zfill(userinfo[0], 6)
+        #userpicture = '%s/%s.png'%(self.custimgdir, userid_pic)
+        listpictures = glob('%s/%s.*'%(self.custimgdir, userid_pic))
+        #print userinfo, userid_pic, self.custimgdir, listpictures
         if listpictures:
             custpicture = listpictures[0]
             if path.isfile(custpicture):

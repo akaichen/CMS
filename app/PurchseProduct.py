@@ -260,16 +260,17 @@ class PurchseProduct(wx.Dialog):
         return
 
     def OnAddButton(self, event):
-        sntext = self.SNText.GetSelection()
+        snselect = self.SNText.GetSelection()
+        sntext = self.prodlist[snselect]
         nametext = self.NameText.GetValue()
         specttext = self.SpecText.GetValue()
         saleprice = self.SalePriceText.GetValue()
         purchseno = self.PurchseText.GetValue()
         totalprice = self.TotalPriceText.GetValue()
-        purchsetime = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+        purchsetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         print 'Purchse Product Information:  '
-        print sntext, nametext, saleprice, purchseno, totalprice, purchsetime
+        print self.userid, sntext, nametext, saleprice, purchseno, totalprice, purchsetime
         sqlaction = 'insert'
         sqlcmd  = '''INSERT INTO %s '''%(self.saletable, )
         sqlcmd += '''   (
@@ -278,7 +279,7 @@ class PurchseProduct(wx.Dialog):
                         Sale_TotalPrice, Sale_PurchseTime
                         )
                     VALUES (
-                        '%s', '%s', '%s',
+                        %s,   '%s', '%s',
                         '%s', '%s', '%s'
                         )
                 '''%(self.userid, sntext, saleprice, purchseno, totalprice,

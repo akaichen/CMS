@@ -417,8 +417,8 @@ class NewCustomerInfo(wx.Dialog):
 
         if self.action == 'modify' and self.userinfo:
             self.InsertUserInfo(self.userinfo)
-            userid = string.zfill(self.userinfo[0], 6)
-            listpictures = glob('%s/%s.*'%(self.imagedir, userid))
+            userid_pic = string.zfill(self.userinfo[0], 6)
+            listpictures = glob('%s/%s.*'%(self.imagedir, userid_pic))
             if listpictures:
                 self.custpicture = listpictures[0]
                 if path.isfile(self.custpicture):
@@ -426,7 +426,7 @@ class NewCustomerInfo(wx.Dialog):
                                           self.imginfo.GetImageInfo('custpicture', self.custpicture)
                     #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.custpicture
             else:
-                self.custpicture = '%s/%s.png'%(self.imagedir, userid)
+                self.custpicture = '%s/%s.png'%(self.imagedir, self.custpicturefile)
 
         self.CustPicture.SetBitmap(self.fgimage)
 
@@ -490,6 +490,7 @@ class NewCustomerInfo(wx.Dialog):
     def InsertUserInfo(self, userinfo):
         self.userid, saletype, dealer, joblevel, name, spouse, birthday, \
                 jobtitle, telephone, cellphone, area, address, email, recommended = userinfo
+        print self.userid
         if self.membertype == 'Member':
             self.DealerText.SetValue(dealer)
             if joblevel == '':
@@ -641,8 +642,10 @@ class NewCustomerInfo(wx.Dialog):
             if self.newcustpicture != '':
                 if self.custpicture == '':
                     userid = self.GetNewUserId()
+                    print userid
                     if userid != '':
-                        self.custpicture = '%s/%s.png'%(self.imagedir, userid)
+                        userid_pic = string.zfill(userid, 6)
+                        self.custpicture = '%s/%s.png'%(self.imagedir, userid_pic)
                     else:
                         self.custpicture = self.custpicturefile
                 #print self.newcustpicture, self.custpicture
@@ -668,8 +671,8 @@ class NewCustomerInfo(wx.Dialog):
             db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
             info = db.ConnectDB()
             if info:
-                userid = info[0]
-            print info, userid
+                userid = info[0][0]
+            #print info, userid
         except:
             print 'Insert into database error'
             print sqlcmd

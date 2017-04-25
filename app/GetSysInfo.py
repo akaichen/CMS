@@ -13,7 +13,7 @@ class GetSysInfo:
         PurchseHeaderId = {}
         PurchseHeaderId[0] = 100
         PurchseHeaderId[1] = 100
-        PurchseHeaderId[2] = 100
+        PurchseHeaderId[2] = 120
 
         return PurchseHeaderList, PurchseHeaderId
 
