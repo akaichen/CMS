@@ -2,11 +2,13 @@
 #Boa:App:BoaApp
 
 from os import path, mkdir
+from glob import glob
 import wx, time
 #import string, re
 #import decimal
 
 import CMSMain
+import GetImageInfo
 
 class BoaApp(wx.App):
     def __init__(self, parent):
@@ -53,14 +55,22 @@ class BoaApp(wx.App):
         self.imgdata['PROD']['PRODDIR']    = proddir
 
         csmainpagefile = self.imgdata['MAIN']['CSFILENAME']
-        if path.isfile(csmainpagefile):
-            self.iconimagefile = csmainpagefile
+        mainfilename, mainfileext = path.splitext(csmainpagefile)
+        listpictures = glob('%s.*'%(mainfilename))
+        #print mainfilename, mainfileext, listpictures
+        if listpictures:
+            self.iconimagefile = listpictures[0]
+            if not path.isfile(self.iconimagefile):
+                self.iconimagefile = self.mainpagefile
         else:
-            self.iconimagefile = self.imgdata['MAIN']['FILENAME']
+            self.iconimagefile = self.mainpagefile
+
+        imginfo = GetImageInfo.GetImageInfo(self.imgdata)
+        self.iconimagetype = imginfo.GetImageType(self.iconimagefile)
 
     def Start(self):
         mainsystem = CMSMain.CMSMainDialog(self.parent, self.workdir, self.dbdata, self.imgdata)
-        mainsystem.SetIcon(wx.Icon(self.iconimagefile, wx.BITMAP_TYPE_PNG))
+        mainsystem.SetIcon(wx.Icon(self.iconimagefile, self.iconimagetype))
         try:
             mainsystem.ShowModal()
         finally:

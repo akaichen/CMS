@@ -20,14 +20,14 @@ class GetImageInfo:
         self.prodwidth  = self.imgdata['PROD']['WIDTH']
         self.prodheight = self.imgdata['PROD']['HEIGHT']
 
-    def GetImageInfo(self, imagetype, image_file):
-        if imagetype == 'mainpage':
+    def GetImageInfo(self, gettype, image_file):
+        if gettype == 'mainpage':
             if image_file == '':
                 image_file = 'mainpage.png'
-        elif imagetype == 'custpicture':
+        elif gettype == 'custpicture':
             if image_file == '':
                 image_file = 'custpicture.png'
-        elif imagetype == 'prodpicture':
+        elif gettype == 'prodpicture':
             if image_file == '':
                 image_file = 'prodpicture.png'
         #else:
@@ -39,34 +39,39 @@ class GetImageInfo:
         if not path.isfile(image_file):
             image_file = '..\\windows_dll\\%s'%image_file
 
-        openimage, imagefile, imagesize = self.ImageInfo(imagetype, image_file)
+        openimage, imagefile, imagesize, imagetype = self.ImageInfo(gettype, image_file)
 
-        return openimage, imagefile, imagesize
+        return openimage, imagefile, imagesize, imagetype
 
-    def ImageInfo(self, imagetype, image_file):
+    def GetImageType(self, image_file):
         if re.compile(r'\.png').findall(image_file):
-            image = wx.Image(image_file, wx.BITMAP_TYPE_PNG)
+            imagetype = wx.BITMAP_TYPE_PNG
         elif re.compile(r'\.gif').findall(image_file):
-            image = wx.Image(image_file, wx.BITMAP_TYPE_GIF)
+            imagetype = wx.BITMAP_TYPE_GIF
         elif re.compile(r'\.jpg').findall(image_file) or re.compile(r'\.jpeg').findall(image_file):
-            image = wx.Image(image_file, wx.BITMAP_TYPE_JPEG)
+            imagetype = wx.BITMAP_TYPE_JPEG
         elif re.compile(r'\.tif').findall(image_file):
-            image = wx.Image(image_file, wx.BITMAP_TYPE_TIF)
+            imagetype = wx.BITMAP_TYPE_TIF
         else:
-            image = wx.Image(image_file, wx.BITMAP_TYPE_ANY)
+            imagetype = wx.BITMAP_TYPE_ANY
 
+        return imagetype
+
+    def ImageInfo(self, gettype, image_file):
+        imagetype = self.GetImageType(image_file)
+        image = wx.Image(image_file, imagetype)
         ### Get image size
         imagefile   = image.ConvertToBitmap()
         imagewidth  = imagefile.GetWidth() 
         imageheight = imagefile.GetHeight()
         imagesize   = imagewidth, imageheight
-        if imagetype in ['', 'mainpage']:
+        if gettype in ['', 'mainpage']:
             maxwidth = self.maxwidth
             maxheight = self.maxheight            
-        elif imagetype == 'custpicture':
+        elif gettype == 'custpicture':
             maxwidth = self.picwidth
             maxheight = self.picheight
-        elif imagetype == 'prodpicture':
+        elif gettype == 'prodpicture':
             maxwidth = self.prodwidth
             maxheight = self.prodheight
 
@@ -105,7 +110,7 @@ class GetImageInfo:
                 else:
                     imagesize = maxwidth, maxheight
 
-        return image_file, imagefile, imagesize
+        return image_file, imagefile, imagesize, imagetype
 
     def GetNewImageFile(self):
         # we don't want a full GUI, so keep the root window from appearing
@@ -124,7 +129,7 @@ class GetImageInfo:
         openimage = Image.open(orgfilename)
         filename, fileext = path.splitext(orgfilename)
         newfilename, newfileext = path.splitext(newfilename)
-        print filename, fileext, newfilename, newfileext
+        #print filename, fileext, newfilename, newfileext
         savefilename = '%s%s'%(newfilename, fileext)
         saveimage = openimage.save(savefilename)
         #saveimage = openimage.save(newfilename, 'PNG')
@@ -132,7 +137,7 @@ class GetImageInfo:
         #copyfile(filename, newfilename)
         #print u'Copy from %s to %s'%(repr(filename), repr(newfilename))
 
-        return newfilename
+        return savefilename
 
     def GetCustImageDir(self):
         custimgdir = self.imgdata['CUST']['CUSTDIR']

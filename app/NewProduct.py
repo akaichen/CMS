@@ -10,7 +10,7 @@ import ConnectDB
 def create(parent):
     return NewProduct(parent)
 
-[wxID_NEWPRODUCT, wxID_NEWPRODUCTPANEL1,
+[wxID_NEWPRODUCT, 
  wxID_BITMAPCMSMAINPAGE, wxID_NEWPRODUCTSTATICBITMAP2,
  wxID_NEWPRODUCTSNHEADER, wxID_NEWPRODUCTSNTEXT,
  wxID_NEWPRODUCTNAMEHEADER, wxID_NEWPRODUCTNAMETEXT,
@@ -20,7 +20,7 @@ def create(parent):
  wxID_NEWPRODUCTADDBUTTON, wxID_NEWPRODUCTEXITBUTTON,
  wxID_CMSMAINDIALOGWARNINGTEXT, wxID_NEWPRODUCTPAGEHEADER,
  wxID_BITMAPPRODPICTURE,
-] = [wx.NewId() for _init_ctrls in range(19)]
+] = [wx.NewId() for _init_ctrls in range(18)]
 
 class NewProduct(wx.Dialog):
     def _init_ctrls(self, prnt, producttitle):
@@ -31,13 +31,10 @@ class NewProduct(wx.Dialog):
               title=producttitle)
         self.SetClientSize(self.mainwin)
 
-        self.panel1 = wx.Panel(id=wxID_NEWPRODUCTPANEL1, name='panel1',
-              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
-              style=wx.TAB_TRAVERSAL)
-
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
-              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self.panel1,
-              pos=wx.Point(0, 0), size=self.mainpagesize, style=wx.TAB_TRAVERSAL)
+              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self,
+              pos=wx.Point(0, 0), size=self.mainwin,
+              style=wx.ALIGN_CENTRE|wx.TAB_TRAVERSAL)
 
         header_x = 20
         header_y = 20
@@ -148,7 +145,7 @@ class NewProduct(wx.Dialog):
         self.WarningText = wx.StaticText(id=wxID_CMSMAINDIALOGWARNINGTEXT,
               label=self.warntext, name='WarningText', parent=self.CMSMainPage,
               pos=warnpoint, size=wx.Size(200, 13),
-              style=wx.ALIGN_RIGHT)
+              style=wx.ALIGN_LEFT)
         self.WarningText.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
@@ -174,7 +171,7 @@ class NewProduct(wx.Dialog):
         self.action = action
         self.prodinfo = prodinfo
 
-        self.fgimagefilename, self.fgimage, self.fgimagesize = \
+        self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
                               self.imginfo.GetImageInfo('prodpicture', self.prodpicturefile)
         #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.prodpicturefile
 
@@ -193,12 +190,13 @@ class NewProduct(wx.Dialog):
             #print self.prodimgdir, listpictures
             if listpictures:
                 self.prodpicture = listpictures[0]
-                if path.isfile(self.prodpicture):
-                    self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                          self.imginfo.GetImageInfo('prodpicture', self.prodpicture)
-                    #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.prodpicture
+                if not path.isfile(self.prodpicture):
+                    self.prodpicture = self.prodpicture
             else:
-                self.prodpicture = '%s/%s.png'%(self.imagedir, prodid)
+                self.prodpicture = self.prodpicture
+            self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
+                                  self.imginfo.GetImageInfo('prodpicture', self.prodpicture)
+            #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.prodpicture
 
         self.ProdPicture.SetBitmap(self.fgimage)
 
@@ -206,7 +204,7 @@ class NewProduct(wx.Dialog):
         self.newprodpicture = self.imginfo.GetNewImageFile()
         if self.newprodpicture != '':
             self.ProdPicture.SetBitmap(wx.NullBitmap)
-            self.fgimagefilename, self.fgimage, self.fgimagesize = \
+            self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
                                   self.imginfo.GetImageInfo('prodpicture', self.newprodpicture)
             #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.newprodpicture
             self.ProdPicture.SetBitmap(self.fgimage)
@@ -230,8 +228,8 @@ class NewProduct(wx.Dialog):
         listprice = self.ListPriceText.GetValue()
         saleprice = self.SalePriceText.GetValue()
 
-        print 'Product Information:  '
-        print sntext, nametext, spectext, listprice, saleprice
+        #print 'Product Information:  '
+        #print sntext, nametext, spectext, listprice, saleprice
         if self.action == 'add':
             sqlaction = 'insert'
             sqlcmd  = '''INSERT INTO %s '''%(self.prodtable, )
@@ -267,7 +265,8 @@ class NewProduct(wx.Dialog):
         if info != 'error':
             if self.newprodpicture != '':
                 if self.prodpicture == '':
-                    prodid = self.GetNewProdId()
+                    #prodid = self.GetNewProdId()
+                    prodid = sntext
                     if prodid != '':
                         self.prodpicture = '%s/%s.png'%(self.imagedir, prodid)
                     else:
@@ -295,8 +294,8 @@ class NewProduct(wx.Dialog):
             db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
             info = db.ConnectDB()
             if info:
-                prodid = info[0]
-            print info, prodid
+                prodid = info[0][0]
+            #print info, prodid
         except:
             print 'Insert into database error'
             print sqlcmd

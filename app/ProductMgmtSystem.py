@@ -14,11 +14,11 @@ def create(parent):
     return ProductMgmtSystem(parent)
 
 [wxID_PRODUCTMGMTSYSTEM, wxID_PRODUCTMGMTSYSTEMEXITBUTTON, 
- wxID_PRODUCTMGMTSYSTEMPRODLIST, wxID_PRODUCTMGMTSYSTEMPANEL1,
+ wxID_PRODUCTMGMTSYSTEMPRODLIST, 
  wxID_BITMAPCMSMAINPAGE, wxID_CMSMAINDIALOGWARNINGTEXT,
  wxID_PRODUCTMGMTSYSTEMNEWPRODUCT, wxID_PRODUCTMGMTSYSTEMMODIFYPRODUCT,
  wxID_PRODUCTMGMTSYSTEMPRODIMAGEBUTTON, 
-] = [wx.NewId() for _init_ctrls in range(9)]
+] = [wx.NewId() for _init_ctrls in range(8)]
 
 class ProductMgmtSystem(wx.Dialog):
     def _init_ctrls(self, prnt, producttitle):
@@ -29,13 +29,10 @@ class ProductMgmtSystem(wx.Dialog):
               title=producttitle)
         self.SetClientSize(self.mainwin)
 
-        self.panel1 = wx.Panel(id=wxID_PRODUCTMGMTSYSTEMPANEL1, name='panel1',
-              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
-              style=wx.TAB_TRAVERSAL)
-
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
-              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self.panel1,
-              pos=wx.Point(0, 0), size=self.mainpagesize, style=wx.TAB_TRAVERSAL)
+              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self,
+              pos=wx.Point(0, 0), size=self.mainwin,
+              style=wx.ALIGN_CENTRE|wx.TAB_TRAVERSAL)
 
         self.NewProduct = wx.lib.buttons.GenButton(id=wxID_PRODUCTMGMTSYSTEMNEWPRODUCT,
               label=self.newprodlabel, name='NewProduct', parent=self.CMSMainPage,
@@ -82,7 +79,7 @@ class ProductMgmtSystem(wx.Dialog):
         self.WarningText = wx.StaticText(id=wxID_CMSMAINDIALOGWARNINGTEXT,
               label=self.warntext, name='WarningText', parent=self.CMSMainPage,
               pos=warnpoint, size=wx.Size(200, 13),
-              style=wx.ALIGN_RIGHT)
+              style=wx.ALIGN_LEFT)
         self.WarningText.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
@@ -90,6 +87,7 @@ class ProductMgmtSystem(wx.Dialog):
     def __init__(self, membertype, producttitle, parent, mainwin, mainpagefile, mainpage, mainpagesize, prodpicturefile, imagedir, imginfo, dbname, prodtable, warntext):
         self.newprodlabel = u'新增產品'
         self.modprodlabel = u'異動產品'
+        self.currentItem = -1
 
         self.membertype = membertype
         self.producttitle = producttitle
@@ -105,9 +103,10 @@ class ProductMgmtSystem(wx.Dialog):
         self.prodtable = prodtable
         self.warntext = warntext
 
-        self.fgimagefilename, self.fgimage, self.fgimagesize = \
+        self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
                               self.imginfo.GetImageInfo('prodpicture', self.prodpicturefile)
         #print self.fgimagefilename, self.fgimage, self.fgimagesize
+        self.mainpagetype = self.imginfo.GetImageType(self.mainpagefile)
         self.prodimgdir = self.imginfo.GetProdImageDir()
 
         sysinfo = GetSysInfo.GetSysInfo(self.membertype)
@@ -141,7 +140,7 @@ class ProductMgmtSystem(wx.Dialog):
                                     self.mainpage, self.mainpagesize, self.prodimgdir, self.imginfo, 
                                     self.ProductHeaderList, self.dbname, self.prodtable, self.warntext,
                                     self.prodpicturefile, action, prodinfo)
-        dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+        dlg.SetIcon(wx.Icon(self.mainpagefile, self.mainpagetype))
         try:
             dlg.ShowModal()
         finally:
@@ -155,7 +154,7 @@ class ProductMgmtSystem(wx.Dialog):
 
     def OnModifyProduct(self, event):
         self.OnItemSelect(self.ProdList)
-        print self.currentItem
+        #print self.currentItem
         if self.currentItem == -1:
             self.ShowNoItemSelectMessage('PRODMODIFY')
         else:
@@ -165,7 +164,7 @@ class ProductMgmtSystem(wx.Dialog):
                                         self.mainpage, self.mainpagesize, self.prodimgdir, self.imginfo,
                                         self.ProductHeaderList, self.dbname, self.prodtable, self.warntext,
                                         self.prodpicturefile, action, prodinfo)
-            dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+            dlg.SetIcon(wx.Icon(self.mainpagefile, self.mainpagetype))
             try:
                 dlg.ShowModal()
             finally:
@@ -180,22 +179,23 @@ class ProductMgmtSystem(wx.Dialog):
     def OnItemSelect(self, event):
         self.currentItem = self.ProdList.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 
-        prodinfo = self.allprodinfo[self.currentItem]
-        prodid = prodinfo[1]
-        #prodpicture = '%s/%s.png'%(self.prodimgdir, prodid)
-        listpictures = glob('%s/%s.*'%(self.prodimgdir, prodid))
-        #print self.prodimgdir, listpictures
-        if listpictures:
-            prodpicture = listpictures[0]
-            if path.isfile(prodpicture):
-                self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                      self.imginfo.GetImageInfo('prodpicture', prodpicture)
-                #print fgimagefilename, fgimage, fgimagesize, prodpicture
-        else:
-            self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                  self.imginfo.GetImageInfo('prodpicture', self.prodpicturefile)
+        if self.currentItem != -1:
+            prodinfo = self.allprodinfo[self.currentItem]
+            prodid = prodinfo[1]
+            #prodpicture = '%s/%s.png'%(self.prodimgdir, prodid)
+            listpictures = glob('%s/%s.*'%(self.prodimgdir, prodid))
+            #print self.prodimgdir, listpictures
+            if listpictures:
+                prodpicture = listpictures[0]
+                if not path.isfile(prodpicture):
+                    prodpicture = self.prodpicturefile
+            else:
+                prodpicture = self.prodpicturefile
 
-        self.ProdImageButton.SetBitmap(self.fgimage)
+            self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
+                                  self.imginfo.GetImageInfo('prodpicture', prodpicture)
+            #print fgimagefilename, fgimage, fgimagesize, prodpicture
+            self.ProdImageButton.SetBitmap(self.fgimage)
 
         return
 
@@ -251,7 +251,10 @@ class ProductMgmtSystem(wx.Dialog):
                 titlename = self.ProductHeaderList[id]
                 colwidth  = self.ProductHeaderId[id]
                 #print id, titlename, colwidth
-                self.ProdList.InsertColumn(cid, titlename, width=colwidth)
+                if cid in [3, 4]:
+                    self.ProdList.InsertColumn(cid, titlename, wx.LIST_FORMAT_RIGHT, width=colwidth)
+                else:
+                    self.ProdList.InsertColumn(cid, titlename, width=colwidth)
                 cid += 1
 
         return
@@ -271,7 +274,10 @@ class ProductMgmtSystem(wx.Dialog):
                     if hidlist.index(id) == 0:
                         self.ProdList.InsertStringItem(listid, u'%s'%prodinfo[id + 1])
                     else:
-                        self.ProdList.SetStringItem(listid, cid, u'%s'%prodinfo[id + 1])
+                        if id in [3, 4]:
+                            self.ProdList.SetStringItem(listid, cid, u'%s'%format(int('%s'%prodinfo[id + 1]), ','))
+                        else:
+                            self.ProdList.SetStringItem(listid, cid, u'%s'%prodinfo[id + 1])
                     cid += 1
                 listid += 1
 
@@ -282,7 +288,7 @@ class ProductMgmtSystem(wx.Dialog):
             msg = u'請先選擇一個產品進行修改！'
 
         dialog = wx.MessageDialog(self, msg, u'警告', wx.OK | wx.ICON_INFORMATION)
-        dialog.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+        dialog.SetIcon(wx.Icon(self.mainpagefile, self.mainpagetype))
         result = dialog.ShowModal()
 
         return

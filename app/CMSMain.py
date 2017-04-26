@@ -2,6 +2,7 @@
 #Boa:Dialog:CMSMainDialog
 
 from os import path
+from glob import glob
 import wx
 
 import GetImageInfo
@@ -17,9 +18,9 @@ def create(parent):
  wxID_NONCUSTMGMTBUTTON, wxID_PRODUCTMGMTBUTTON, 
  wxID_PURCHSEMGMTBUTTON, 
  wxID_FOLLOWUPBUTTON, wxID_EXITBUTTON,
- wxID_CMSMAINPANEL, wxID_BITMAPCMSMAINPAGE,
+ wxID_BITMAPCMSMAINPAGE,
  wxID_CMSMAINDIALOGWARNINGTEXT, wxID_CHANGEBUTTON,
-] = [wx.NewId() for _init_ctrls in range(11)]
+] = [wx.NewId() for _init_ctrls in range(10)]
 
 class CMSMainDialog(wx.Dialog):
     def _init_ctrls(self, prnt, maintitle, custlabel, noncustlabel, productlabel, purchselabel, followlabel, exitlabel, changelabel):
@@ -31,13 +32,10 @@ class CMSMainDialog(wx.Dialog):
               title=maintitle)
         self.SetClientSize(self.mainwin)
 
-        self.CMSMainPanel = wx.Panel(id=wxID_CMSMAINPANEL, name='CMSMainPanel',
-              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
-              style=wx.TAB_TRAVERSAL)
-
-        self.CMSMainPage = wx.StaticBitmap(bitmap=wx.NullBitmap,
-              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self.CMSMainPanel,
-              pos=wx.Point(0, 0), size=self.bgimagesize, style=wx.ALIGN_CENTRE|wx.TAB_TRAVERSAL)
+        self.CMSMainPage = wx.StaticBitmap(bitmap=self.bgimage,
+              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self,
+              pos=wx.Point(0, 0), size=self.mainwin,
+              style=wx.ALIGN_CENTRE|wx.TAB_TRAVERSAL)
 
         ### 會員資料
         custpoint = (50, 30)
@@ -91,7 +89,7 @@ class CMSMainDialog(wx.Dialog):
         changepoint = (20, self.mainwin[1] - 50)
         self.ChangeButton = wx.Button(id=wxID_CHANGEBUTTON, label=changelabel,
               name='ChangeButton', parent=self.CMSMainPage, pos=changepoint,
-              size=wx.Size(80, 25), style=wx.ALIGN_RIGHT)
+              size=wx.Size(80, 25), style=wx.ALIGN_LEFT)
         self.ChangeButton.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
 
@@ -100,7 +98,7 @@ class CMSMainDialog(wx.Dialog):
         self.WarningText = wx.StaticText(id=wxID_CMSMAINDIALOGWARNINGTEXT,
               label=self.warntext, name='WarningText', parent=self.CMSMainPage,
               pos=warnpoint, size=wx.Size(200, 13),
-              style=wx.ALIGN_RIGHT)
+              style=wx.ALIGN_LEFT)
         self.WarningText.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
@@ -140,13 +138,20 @@ class CMSMainDialog(wx.Dialog):
         self.warntext  = u'軟體版權為 陳智凱 所有，有著作權、侵害必究'
 
         self.imginfo = GetImageInfo.GetImageInfo(self.imgdata)
-            #(self.imagedir, picwidth, picheight, maxwidth, maxheight)
-        if path.isfile(self.csmainpagefile):
-            self.bgimagefile = self.csmainpagefile
+        #(self.imagedir, picwidth, picheight, maxwidth, maxheight)
+        mainfilename, mainfileext = path.splitext(self.csmainpagefile)
+        listpictures = glob('%s.*'%(mainfilename))
+        #print mainfilename, mainfileext, listpictures
+        if listpictures:
+            self.bgimagefile = listpictures[0]
+            if not path.isfile(self.bgimagefile):
+                self.bgimagefile = self.mainpagefile
         else:
             self.bgimagefile = self.mainpagefile
-        self.bgimagefilename, self.bgimage, self.bgimagesize = self.imginfo.GetImageInfo('mainpage', self.bgimagefile)
-        #print self.bgimagesize
+        #print self.bgimagefile
+        self.bgimagefilename, self.bgimage, self.bgimagesize, self.bgimagetype = \
+                              self.imginfo.GetImageInfo('mainpage', self.bgimagefile)
+        #print self.bgimagefilename, self.bgimage, self.bgimagesize
         #self.mainwin = (500, 500)
         self.mainwin = self.bgimagesize
         #print self.mainwin
@@ -154,7 +159,6 @@ class CMSMainDialog(wx.Dialog):
         self._init_ctrls(parent, maintitle, custlabel, noncustlabel, productlabel,
                          purchselabel, followlabel, exitlabel, changelabel)
         self.Center()
-        self.CMSMainPage.SetBitmap(self.bgimage)
 
         self.Bind(wx.EVT_BUTTON, self.OnCustMgmtButton,    self.CustMgmtButton)
         self.Bind(wx.EVT_BUTTON, self.OnNonCustMgmtButton, self.NonCustMgmtButton)
@@ -173,7 +177,7 @@ class CMSMainDialog(wx.Dialog):
         dlg = CustMgmtSystem.CustMgmtSystem('Member', self.custtitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
                                             self.bgimagesize, self.custpicturefile, self.imagedir, self.imginfo,
                                             self.dbname, self.custtable, self.warntext)
-        dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
+        dlg.SetIcon(wx.Icon(self.bgimagefile, self.bgimagetype))
         try:
             dlg.ShowModal()
         finally:
@@ -183,7 +187,7 @@ class CMSMainDialog(wx.Dialog):
         dlg = CustMgmtSystem.CustMgmtSystem('Nonmember', self.noncusttitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
                                             self.bgimagesize, self.custpicturefile, self.imagedir, self.imginfo,
                                             self.dbname, self.custtable, self.warntext)
-        dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
+        dlg.SetIcon(wx.Icon(self.bgimagefile, self.bgimagetype))
         try:
             dlg.ShowModal()
         finally:
@@ -193,7 +197,7 @@ class CMSMainDialog(wx.Dialog):
         dlg = ProductMgmtSystem.ProductMgmtSystem('All', self.producttitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
                                                   self.bgimagesize, self.prodpicturefile, self.imagedir, self.imginfo,
                                                   self.dbname, self.prodtable, self.warntext)
-        dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
+        dlg.SetIcon(wx.Icon(self.bgimagefile, self.bgimagetype))
         try:
             dlg.ShowModal()
         finally:
@@ -203,7 +207,7 @@ class CMSMainDialog(wx.Dialog):
         dlg = PurchseMgmtSystem.PurchseMgmtSystem('All', self.purchsetitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
                                                   self.bgimagesize, self.prodpicturefile, self.imagedir, self.imginfo,
                                                   self.dbname, self.custtable, self.prodtable, self.saletable, self.warntext)
-        dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
+        dlg.SetIcon(wx.Icon(self.bgimagefile, self.bgimagetype))
         try:
             dlg.ShowModal()
         finally:
@@ -213,7 +217,7 @@ class CMSMainDialog(wx.Dialog):
         dlg = FollowUpSystem.FollowUpSystem(self.followtitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
                                             self.bgimagesize, self.imagedir, self.imginfo,
                                             self.warntext)
-        dlg.SetIcon(wx.Icon(self.bgimagefile, wx.BITMAP_TYPE_PNG))
+        dlg.SetIcon(wx.Icon(self.bgimagefile, self.bgimagetype))
         try:
             dlg.ShowModal()
         finally:
@@ -227,9 +231,11 @@ class CMSMainDialog(wx.Dialog):
         selectfilename = self.imginfo.GetNewImageFile()
         if selectfilename != '':
             self.CMSMainPage.SetBitmap(wx.NullBitmap)
-            self.csmainpagefile = self.imginfo.CopyNewImageFile(selectfilename, self.csmainpagefile)
             #print selectfilename, self.csmainpagefile
-            self.bgimagefilename, self.bgimage, self.bgimagesize = \
+            self.csmainpagefile = self.imginfo.CopyNewImageFile(selectfilename, self.csmainpagefile)
+            #print self.csmainpagefile
+            #print selectfilename, self.csmainpagefile
+            self.bgimagefilename, self.bgimage, self.bgimagesize, self.bgimagetype = \
                                   self.imginfo.GetImageInfo('mainpage', self.csmainpagefile)
             #print self.bgimagesize
             self.CMSMainPage.SetBitmap(self.bgimage)

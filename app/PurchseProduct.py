@@ -11,7 +11,7 @@ import ConnectDB
 def create(parent):
     return PurchseProduct(parent)
 
-[wxID_PURCHSEPRODUCT, wxID_PURCHSEPRODUCTPANEL1,
+[wxID_PURCHSEPRODUCT, 
  wxID_BITMAPCMSMAINPAGE, wxID_PURCHSEPRODUCTPAGEHEADER,
  wxID_PURCHSEPRODUCTSNHEADER, wxID_PURCHSEPRODUCTSNTEXT,
  wxID_BITMAPPRODPICTURE, wxID_PURCHSEPRODUCTNAMEHEADER,
@@ -22,7 +22,8 @@ def create(parent):
  wxID_PURCHSEPRODUCTLISTPRICEHEADER, wxID_PURCHSEPRODUCTLISTPRICETEXT,
  wxID_PURCHSEPRODUCTSALEPRICEHEADER, wxID_PURCHSEPRODUCTSALEPRICETEXT,
  wxID_PURCHSEPRODUCTTOTALPRICEHEADER, wxID_PURCHSEPRODUCTTOTALPRICETEXT,
-] = [wx.NewId() for _init_ctrls in range(22)]
+ wxID_PURCHSEPRODUCTCUSTHEADER, wxID_PURCHSEPRODUCTCUSTTEXT,
+] = [wx.NewId() for _init_ctrls in range(23)]
 
 class PurchseProduct(wx.Dialog):
     def _init_ctrls(self, prnt, title, prodlist):
@@ -33,13 +34,10 @@ class PurchseProduct(wx.Dialog):
               title=title)
         self.SetClientSize(self.mainwin)
 
-        self.panel1 = wx.Panel(id=wxID_PURCHSEPRODUCTPANEL1, name='panel1',
-              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
-              style=wx.TAB_TRAVERSAL)
-
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
-              id=wxID_BITMAPCMSMAINPAGE, name='BitmapMainPage', parent=self.panel1,
-              pos=wx.Point(0, 0), size=self.mainpagesize, style=wx.TAB_TRAVERSAL)
+              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self,
+              pos=wx.Point(0, 0), size=self.mainwin,
+              style=wx.ALIGN_CENTRE|wx.TAB_TRAVERSAL)
 
         header_x = 20
         header_y = 20
@@ -52,21 +50,35 @@ class PurchseProduct(wx.Dialog):
 
         split_x_1 = 20
         col2_extend = 150
+        custlabel = u'%s'%self.CustomerHeaderList[2]
+        self.CustHeader = wx.StaticText(id=wxID_PURCHSEPRODUCTCUSTHEADER,
+              label=custlabel, name='CustHeader', parent=self.CMSMainPage,
+              pos=wx.Point(split_x_1, 80), size=wx.Size(140, 25),
+              style=wx.ALIGN_CENTRE)
+        self.CustHeader.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
+              False, u'新細明體'))
+
+        self.CustText = wx.TextCtrl(id=wxID_PURCHSEPRODUCTCUSTTEXT,
+              name='NameText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 80),
+              size=wx.Size(200, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+        self.CustText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
+              False, u'新細明體'))
+
         snlabel = u'%s'%self.ProductHeaderList[0]
         self.SNHeader = wx.StaticText(id=wxID_PURCHSEPRODUCTSNHEADER,
               label=snlabel, name='SNHeader', parent=self.CMSMainPage,
-              pos=wx.Point(split_x_1, 80), size=wx.Size(140, 25),
+              pos=wx.Point(split_x_1, 120), size=wx.Size(140, 25),
               style=wx.ALIGN_CENTRE)
         self.SNHeader.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.SNText = wx.Choice(choices=prodlist,
               id=wxID_PURCHSEPRODUCTSNTEXT, name='SNText',
-              parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 80),
+              parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 120),
               size=wx.Size(200, 25), style=0)
         self.SNText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
-        
+
         ### Product Picture
         prodpicture_x = split_x_1 + col2_extend + 200 + 20
         prodpicture_y = 20
@@ -78,13 +90,13 @@ class PurchseProduct(wx.Dialog):
         namelabel = u'%s'%self.ProductHeaderList[1]
         self.NameHeader = wx.StaticText(id=wxID_PURCHSEPRODUCTNAMEHEADER,
               label=namelabel, name='NameHeader', parent=self.CMSMainPage,
-              pos=wx.Point(split_x_1, 120), size=wx.Size(140, 25), 
+              pos=wx.Point(split_x_1, 160), size=wx.Size(140, 25), 
               style=wx.ALIGN_CENTRE)
         self.NameHeader.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.NameText = wx.TextCtrl(id=wxID_PURCHSEPRODUCTNAMETEXT,
-              name='NameText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 120),
+              name='NameText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 160),
               size=wx.Size(200, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
         self.NameText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
@@ -92,13 +104,13 @@ class PurchseProduct(wx.Dialog):
         speclabel = u'%s'%self.ProductHeaderList[2]
         self.SpecHeader = wx.StaticText(id=wxID_PURCHSEPRODUCTSPECHEADER,
               label=speclabel, name='SpecHeader', parent=self.CMSMainPage,
-              pos=wx.Point(split_x_1, 160), size=wx.Size(140, 25), 
+              pos=wx.Point(split_x_1, 200), size=wx.Size(140, 25), 
               style=wx.ALIGN_CENTRE)
         self.SpecHeader.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.SpecText = wx.TextCtrl(id=wxID_PURCHSEPRODUCTSPECTEXT,
-              name='SpecText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 160),
+              name='SpecText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 200),
               size=wx.Size(200, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
         self.SpecText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
@@ -107,13 +119,13 @@ class PurchseProduct(wx.Dialog):
         listpricelabel = u'%s'%self.ProductHeaderList[3]
         self.ListPriceHeader = wx.StaticText(id=wxID_PURCHSEPRODUCTLISTPRICEHEADER,
               label=listpricelabel, name='ListPriceHeader', parent=self.CMSMainPage,
-              pos=wx.Point(split_x_1, 200), size=wx.Size(140, 25), 
+              pos=wx.Point(split_x_1, 220), size=wx.Size(140, 25), 
               style=wx.ALIGN_CENTRE)
         self.ListPriceHeader.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.ListPriceText = wx.TextCtrl(id=wxID_PURCHSEPRODUCTLISTPRICETEXT,
-              name='ListPriceText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 200),
+              name='ListPriceText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 220),
               size=wx.Size(200, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
         self.ListPriceText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
@@ -122,13 +134,13 @@ class PurchseProduct(wx.Dialog):
         salepricelabel = u'%s'%self.ProductHeaderList[4]
         self.SalePriceHeader = wx.StaticText(id=wxID_PURCHSEPRODUCTSALEPRICEHEADER,
               label=salepricelabel, name='SalePriceHeader', parent=self.CMSMainPage,
-              pos=wx.Point(split_x_1, 200), size=wx.Size(140, 25), 
+              pos=wx.Point(split_x_1, 240), size=wx.Size(140, 25), 
               style=wx.ALIGN_CENTRE)
         self.SalePriceHeader.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.SalePriceText = wx.TextCtrl(id=wxID_PURCHSEPRODUCTSALEPRICETEXT,
-              name='SalePriceText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 200),
+              name='SalePriceText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 240),
               size=wx.Size(200, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
         self.SalePriceText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
@@ -136,13 +148,13 @@ class PurchseProduct(wx.Dialog):
         purchselabel = u'購買數量'
         self.PurchseHeader = wx.StaticText(id=wxID_PURCHSEPRODUCTPURCHSEHEADER,
               label=purchselabel, name='PurchseHeader', parent=self.CMSMainPage,
-              pos=wx.Point(split_x_1, 240), size=wx.Size(140, 25), 
+              pos=wx.Point(split_x_1, 280), size=wx.Size(140, 25), 
               style=wx.ALIGN_CENTRE)
         self.PurchseHeader.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.PurchseText = wx.TextCtrl(id=wxID_PURCHSEPRODUCTPURCHSETEXT,
-              name='PurchseText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 240),
+              name='PurchseText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 280),
               size=wx.Size(200, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
         self.PurchseText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
@@ -150,19 +162,19 @@ class PurchseProduct(wx.Dialog):
         totalpricelabel = u'購買總價'
         self.TotalPriceHeader = wx.StaticText(id=wxID_PURCHSEPRODUCTTOTALPRICEHEADER,
               label=totalpricelabel, name='TotalPriceHeader', parent=self.CMSMainPage,
-              pos=wx.Point(split_x_1, 280), size=wx.Size(140, 25), 
+              pos=wx.Point(split_x_1, 320), size=wx.Size(140, 25), 
               style=wx.ALIGN_CENTRE)
         self.TotalPriceHeader.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.TotalPriceText = wx.TextCtrl(id=wxID_PURCHSEPRODUCTTOTALPRICETEXT,
-              name='TotalPriceText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 280),
+              name='TotalPriceText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 320),
               size=wx.Size(200, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
         self.TotalPriceText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         add_x = 60
-        add_y = 320
+        add_y = 360
         self.AddButton = wx.Button(id=wxID_PURCHSEPRODUCTADDBUTTON,
               label=u'確認', name='AddButton', parent=self.CMSMainPage,
               pos=wx.Point(add_x, add_y), size=wx.Size(80, 30), style=0)
@@ -181,12 +193,12 @@ class PurchseProduct(wx.Dialog):
         self.WarningText = wx.StaticText(id=wxID_CMSMAINDIALOGWARNINGTEXT,
               label=self.warntext, name='WarningText', parent=self.CMSMainPage,
               pos=warnpoint, size=wx.Size(200, 13),
-              style=wx.ALIGN_RIGHT)
+              style=wx.ALIGN_LEFT)
         self.WarningText.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
 
-    def __init__(self, parent, mainwin, purprodlabel, mainpagefile, mainpage, mainpagesize, ProductHeaderList, prodpicturefile, imagedir, imginfo, dbname, saletable, userid, allprodinfo, warntext):
+    def __init__(self, parent, mainwin, purprodlabel, mainpagefile, mainpage, mainpagesize, ProductHeaderList, CustomerHeaderList, prodpicturefile, imagedir, imginfo, dbname, saletable, userinfo, allprodinfo, warntext):
         self.prodpicture = ''
 
         self.parent = parent
@@ -196,16 +208,17 @@ class PurchseProduct(wx.Dialog):
         self.mainpage = mainpage
         self.mainpagesize = mainpagesize
         self.ProductHeaderList = ProductHeaderList
+        self.CustomerHeaderList = CustomerHeaderList
         self.prodpicturefile = prodpicturefile
         self.imagedir = imagedir
         self.imginfo = imginfo
         self.dbname = dbname
         self.saletable = saletable
-        self.userid = userid
+        self.userinfo = userinfo
         self.allprodinfo = allprodinfo
         self.warntext = warntext
 
-        self.fgimagefilename, self.fgimage, self.fgimagesize = \
+        self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
                               self.imginfo.GetImageInfo('prodpicture', self.prodpicturefile)
         #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.prodpicturefile
 
@@ -231,7 +244,7 @@ class PurchseProduct(wx.Dialog):
         self.newprodpicture = self.imginfo.GetNewImageFile()
         if self.newprodpicture != '':
             self.ProdPicture.SetBitmap(wx.NullBitmap)
-            self.fgimagefilename, self.fgimage, self.fgimagesize = \
+            self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
                                   self.imginfo.GetImageInfo('prodpicture', self.newprodpicture)
             #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.newprodpicture
             self.ProdPicture.SetBitmap(self.fgimage)
@@ -260,6 +273,7 @@ class PurchseProduct(wx.Dialog):
         return
 
     def OnAddButton(self, event):
+        userid = self.userinfo[0]
         snselect = self.SNText.GetSelection()
         sntext = self.prodlist[snselect]
         nametext = self.NameText.GetValue()
@@ -270,7 +284,7 @@ class PurchseProduct(wx.Dialog):
         purchsetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         print 'Purchse Product Information:  '
-        print self.userid, sntext, nametext, saleprice, purchseno, totalprice, purchsetime
+        print userid, sntext, nametext, saleprice, purchseno, totalprice, purchsetime
         sqlaction = 'insert'
         sqlcmd  = '''INSERT INTO %s '''%(self.saletable, )
         sqlcmd += '''   (
@@ -279,10 +293,10 @@ class PurchseProduct(wx.Dialog):
                         Sale_TotalPrice, Sale_PurchseTime
                         )
                     VALUES (
-                        %s,   '%s', '%s',
+                        '%s',   '%s', '%s',
                         '%s', '%s', '%s'
                         )
-                '''%(self.userid, sntext, saleprice, purchseno, totalprice,
+                '''%(userid, sntext, saleprice, purchseno, totalprice,
                      purchsetime)
 
         try:
@@ -306,6 +320,9 @@ class PurchseProduct(wx.Dialog):
         return
 
     def OnQueryProduct(self, event):
+        custname = self.userinfo[4]
+        self.CustText.SetValue(custname)
+
         snselect = int(self.SNText.GetSelection())
         #print snselect
         sntext = self.prodlist[snselect]
@@ -326,7 +343,7 @@ class PurchseProduct(wx.Dialog):
         else:
             self.prodpicture = self.prodpicturefile
 
-        self.fgimagefilename, self.fgimage, self.fgimagesize = \
+        self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
                               self.imginfo.GetImageInfo('prodpicture', self.prodpicture)
         #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.prodpicture
         self.ProdPicture.SetBitmap(self.fgimage)

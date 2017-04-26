@@ -12,11 +12,11 @@ def create(parent):
     return PurchseMgmtSystem(parent)
 
 [wxID_PURCHSEMGMTSYSTEM, wxID_PURCHSEMGMTSYSTEMEXITBUTTON, 
- wxID_PURCHSEMGMTSYSTEMCUSTLIST, wxID_PURCHSEMGMTSYSTEMPANEL1,
+ wxID_PURCHSEMGMTSYSTEMCUSTLIST, 
  wxID_BITMAPCMSMAINPAGE, wxID_CMSMAINDIALOGWARNINGTEXT,
  wxID_PURCHSEMGMTSYSTEMPURCHSEPRODUCT, wxID_PURCHSEMGMTSYSTEMPURCHSEPOINT,
  wxID_PURCHSEMGMTSYSTEMPURCHSELIST, 
-] = [wx.NewId() for _init_ctrls in range(9)]
+] = [wx.NewId() for _init_ctrls in range(8)]
 
 class PurchseMgmtSystem(wx.Dialog):
     def _init_ctrls(self, prnt, purchsetitle):
@@ -27,13 +27,10 @@ class PurchseMgmtSystem(wx.Dialog):
               title=purchsetitle)
         self.SetClientSize(self.mainwin)
 
-        self.panel1 = wx.Panel(id=wxID_PURCHSEMGMTSYSTEMPANEL1, name='panel1',
-              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
-              style=wx.TAB_TRAVERSAL)
-
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
-              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self.panel1,
-              pos=wx.Point(0, 0), size=self.mainpagesize, style=wx.TAB_TRAVERSAL)
+              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self,
+              pos=wx.Point(0, 0), size=self.mainwin,
+              style=wx.ALIGN_CENTRE|wx.TAB_TRAVERSAL)
 
         self.PurchseProduct = wx.lib.buttons.GenButton(id=wxID_PURCHSEMGMTSYSTEMPURCHSEPRODUCT,
               label=self.purprodlabel, name='PurchseProduct', parent=self.CMSMainPage,
@@ -82,14 +79,14 @@ class PurchseMgmtSystem(wx.Dialog):
         self.WarningText = wx.StaticText(id=wxID_CMSMAINDIALOGWARNINGTEXT,
               label=self.warntext, name='WarningText', parent=self.CMSMainPage,
               pos=warnpoint, size=wx.Size(200, 13),
-              style=wx.ALIGN_RIGHT)
+              style=wx.ALIGN_LEFT)
         self.WarningText.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
 
     def __init__(self, membertype, purchsetitle, parent, mainwin, mainpagefile, mainpage, mainpagesize, prodpicturefile, imagedir, imginfo, dbname, custtable, prodtable, saletable, warntext):
-        self.currentItem      = ''
-        self.currentPointItem = ''
+        self.currentItem      = -1
+        self.currentPointItem = -1
         self.purprodlabel     = u'產品訂購'
 
         self.membertype = membertype
@@ -112,6 +109,7 @@ class PurchseMgmtSystem(wx.Dialog):
         self.ProductHeaderList, self.ProductHeaderId = sysinfo.GetProductHeaderList()
         self.PurchseHeaderList, self.PurchseHeaderId = sysinfo.GetPurchseHeaderList()
 
+        self.mainpagetype = self.imginfo.GetImageType(self.mainpagefile)
         self.prodimgdir = self.imginfo.GetProdImageDir()
 
         self._init_ctrls(parent, purchsetitle)
@@ -143,14 +141,16 @@ class PurchseMgmtSystem(wx.Dialog):
         #print self.currentItem
         if self.currentItem == -1:
             self.ShowNoItemSelectMessage('PURCHSE')
+        elif not self.allprodinfo:
+            self.ShowNoItemSelectMessage('NEWPRODUCT')
         else:
             userinfo = self.alluserinfo[self.currentItem]
             userid = userinfo[0]
             dlg = PurchseProduct.PurchseProduct(self.parent, self.mainwin, self.purprodlabel, self.mainpagefile,
-                                                self.mainpage, self.mainpagesize, self.ProductHeaderList, self.prodpicturefile,
-                                                self.prodimgdir, self.imginfo, self.dbname, self.saletable,
-                                                userid, self.allprodinfo, self.warntext)
-            dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+                                                self.mainpage, self.mainpagesize, self.ProductHeaderList, self.CustomerHeaderList,
+                                                self.prodpicturefile, self.prodimgdir, self.imginfo, self.dbname, self.saletable,
+                                                userinfo, self.allprodinfo, self.warntext)
+            dlg.SetIcon(wx.Icon(self.mainpagefile, self.mainpagetype))
             try:
                 dlg.ShowModal()
             finally:
@@ -232,8 +232,9 @@ class PurchseMgmtSystem(wx.Dialog):
             sqlcmd = '''SELECT Sale_CustomerId, FORMAT(Sale_PurchseTime, 'yyyy-mm') AS PurchseTime,
                                 SUM(Sale_TotalPrice)
                         FROM %s
-                        WHERE Sale_CustomerId = %s
+                        WHERE Sale_CustomerId = '%s'
                         GROUP BY Sale_CustomerId, FORMAT(Sale_PurchseTime, 'yyyy-mm')
+                        ORDER BY FORMAT(Sale_PurchseTime, 'yyyy-mm')
                     '''%(self.saletable, int(userid))
 
         try:
@@ -282,7 +283,10 @@ class PurchseMgmtSystem(wx.Dialog):
                 titlename = self.PurchseHeaderList[id]
                 colwidth  = self.PurchseHeaderId[id]
                 #print id, titlename, colwidth
-                self.PurchseList.InsertColumn(cid, titlename, width=colwidth)
+                if cid in [1, 2]:
+                    self.PurchseList.InsertColumn(cid, titlename, wx.LIST_FORMAT_RIGHT, width=colwidth)
+                else:
+                    self.PurchseList.InsertColumn(cid, titlename, width=colwidth)
                 cid += 1
 
         return
@@ -311,33 +315,52 @@ class PurchseMgmtSystem(wx.Dialog):
         return
 
     def InitPurchseData(self, purchseinfo):
+        totalpoint = 0
         #print 'Clean purchse data'
         self.PurchseList.DeleteAllItems()
         if purchseinfo:
             listid = 0
             for purinfo in purchseinfo:
                 #print purinfo
+                userid, purmonth, purprice = purinfo
+                totalpoint += purprice
+                self.PurchseList.InsertStringItem(listid, u'%s'%purmonth)
+                self.PurchseList.SetStringItem(listid, 1, u'%s'%format(int(purprice), ','))
+                self.PurchseList.SetStringItem(listid, 2, u'%s'%format(int(totalpoint), ','))
+                listid += 1
+                continue
+
+
                 cid = 0
                 hidlist = self.PurchseHeaderId.keys()
                 hidlist.sort()
                 #print hidlist
                 for id in hidlist:
-                    #print listid, id, cid, purinfo[id + 2]
-                    if hidlist.index(id) == 0:
+                    if id == 0:
+                        continue
+                    print listid, id, cid, purinfo[id]
+                    if id == 2:
+                        totalpoint += purinfo[id]
+                    if hidlist.index(id) == 1:
                         self.PurchseList.InsertStringItem(listid, u'%s'%purinfo[id])
                     else:
                         self.PurchseList.SetStringItem(listid, cid, u'%s'%purinfo[id])
+                    if id == len(hidlist):
+                        print totalpoint
                     cid += 1
                 listid += 1
+                #print totalpoint
 
         return
 
     def ShowNoItemSelectMessage(self, type):
         if type == 'PURCHSE':
             msg = u'請先選擇一個用戶進行產品訂購！'
+        elif type == 'NEWPRODUCT':
+            msg = u'請先新增一項產品'
 
         dialog = wx.MessageDialog(self, msg, u'警告', wx.OK | wx.ICON_INFORMATION)
-        dialog.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+        dialog.SetIcon(wx.Icon(self.mainpagefile, self.mainpagetype))
         result = dialog.ShowModal()
 
         return

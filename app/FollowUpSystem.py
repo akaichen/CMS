@@ -8,9 +8,9 @@ def create(parent):
     return FollowUpSystem(parent)
 
 [wxID_FOLLOWUPSYSTEM, wxID_FOLLOWUPSYSTEMEXITBUTTON, 
- wxID_FOLLOWUPSYSTEMCUSTLIST, wxID_FOLLOWUPSYSTEMPANEL1,
+ wxID_FOLLOWUPSYSTEMCUSTLIST, 
  wxID_BITMAPCMSMAINPAGE, wxID_CMSMAINDIALOGWARNINGTEXT, 
-] = [wx.NewId() for _init_ctrls in range(6)]
+] = [wx.NewId() for _init_ctrls in range(5)]
 
 class FollowUpSystem(wx.Dialog):
     def _init_ctrls(self, prnt, followtitle):
@@ -21,13 +21,10 @@ class FollowUpSystem(wx.Dialog):
               title=followtitle)
         self.SetClientSize(self.mainwin)
 
-        self.panel1 = wx.Panel(id=wxID_FOLLOWUPSYSTEMPANEL1, name='panel1',
-              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
-              style=wx.TAB_TRAVERSAL)
-
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
-              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self.panel1,
-              pos=wx.Point(0, 0), size=self.mainpagesize, style=wx.TAB_TRAVERSAL)
+              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self,
+              pos=wx.Point(0, 0), size=self.mainwin,
+              style=wx.ALIGN_CENTRE|wx.TAB_TRAVERSAL)
 
         custlist_size_x = self.mainwin[0] - 40
         custlist_size_y = self.mainwin[1] - 40 - 50 - 50
@@ -50,7 +47,7 @@ class FollowUpSystem(wx.Dialog):
         self.WarningText = wx.StaticText(id=wxID_CMSMAINDIALOGWARNINGTEXT,
               label=self.warntext, name='WarningText', parent=self.CMSMainPage,
               pos=warnpoint, size=wx.Size(200, 13),
-              style=wx.ALIGN_RIGHT)
+              style=wx.ALIGN_LEFT)
         self.WarningText.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))

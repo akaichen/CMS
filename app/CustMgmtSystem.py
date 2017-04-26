@@ -17,10 +17,10 @@ def create(parent):
 [wxID_CUSTMGMTSYSTEM, wxID_CUSTMGMTSYSTEMEXITBUTTON, 
  wxID_CUSTMGMTSYSTEMNEWCUSTOMER, wxID_CUSTMGMTSYSTEMMODIFYCUSTOMER, 
  wxID_CUSTMGMTSYSTEMGENQUERYCUSTOMER, wxID_CUSTMGMTSYSTEMCUSTLIST, 
- wxID_CUSTMGMTSYSTEMPANEL1, wxID_BITMAPCMSMAINPAGE,
+ wxID_BITMAPCMSMAINPAGE,
  wxID_CMSMAINDIALOGWARNINGTEXT, wxID_CUSTMGMTSYSTEMQUERYJOBLEVEL,
  wxID_CUSTMGMTSYSTEMCUSTIMAGEBUTTON, 
-] = [wx.NewId() for _init_ctrls in range(11)]
+] = [wx.NewId() for _init_ctrls in range(10)]
 
 class CustMgmtSystem(wx.Dialog):
     def _init_ctrls(self, prnt, queryjoblist):
@@ -31,23 +31,20 @@ class CustMgmtSystem(wx.Dialog):
               title=self.custtitle)
         self.SetClientSize(self.mainwin)
 
-        self.panel1 = wx.Panel(id=wxID_CUSTMGMTSYSTEMPANEL1, name='panel1',
-              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
-              style=wx.TAB_TRAVERSAL)
-
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
-              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self.panel1,
-              pos=wx.Point(0, 0), size=self.mainpagesize, style=wx.TAB_TRAVERSAL)
+              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self,
+              pos=wx.Point(0, 0), size=self.mainwin,
+              style=wx.ALIGN_CENTRE|wx.TAB_TRAVERSAL)
 
         self.NewCustomer = wx.lib.buttons.GenButton(id=wxID_CUSTMGMTSYSTEMNEWCUSTOMER,
               label=u'新增', name='NewCustomer', parent=self.CMSMainPage,
-              pos=wx.Point(20, 10), size=wx.Size(80, 30), style=0)
+              pos=wx.Point(20, 10), size=wx.Size(80, 30), style=wx.ALIGN_CENTRE)
         self.NewCustomer.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         self.ModifyCustomer = wx.lib.buttons.GenButton(id=wxID_CUSTMGMTSYSTEMMODIFYCUSTOMER,
               label=u'編輯', name='ModifyCustomer', parent=self.CMSMainPage,
-              pos=wx.Point(120, 10), size=wx.Size(80, 30), style=0)
+              pos=wx.Point(120, 10), size=wx.Size(80, 30), style=wx.ALIGN_CENTRE)
         self.ModifyCustomer.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -68,7 +65,7 @@ class CustMgmtSystem(wx.Dialog):
             self.QueryJobLevel = wx.lib.buttons.GenButton(id=wxID_CUSTMGMTSYSTEMQUERYJOBLEVEL, 
                   label=u'轉成正式會員', name='MoveCustomer', parent=self.CMSMainPage,
                   pos=wx.Point(joblevel_x, joblevel_y), size=wx.Size(150, 30),
-                  style=0)
+                  style=wx.ALIGN_CENTRE)
             self.QueryJobLevel.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
                   False, u'新細明體'))
 
@@ -116,7 +113,7 @@ class CustMgmtSystem(wx.Dialog):
         self.WarningText = wx.StaticText(id=wxID_CMSMAINDIALOGWARNINGTEXT,
               label=self.warntext, name='WarningText', parent=self.CMSMainPage,
               pos=warnpoint, size=wx.Size(200, 13),
-              style=wx.ALIGN_RIGHT)
+              style=wx.ALIGN_LEFT)
         self.WarningText.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
@@ -137,9 +134,10 @@ class CustMgmtSystem(wx.Dialog):
         self.warntext = warntext
         self.currentItem = -1
 
-        self.fgimagefilename, self.fgimage, self.fgimagesize = \
+        self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
                               self.imginfo.GetImageInfo('custpicture', self.custpicturefile)
         #print self.fgimagefilename, self.fgimage, self.fgimagesize
+        self.mainpagetype = self.imginfo.GetImageType(self.mainpagefile)
         self.custimgdir = self.imginfo.GetCustImageDir()
 
         sysinfo = GetSysInfo.GetSysInfo(self.membertype)
@@ -190,7 +188,7 @@ class CustMgmtSystem(wx.Dialog):
                                               self.custimgdir, self.imginfo, self.dbname, self.custtable, self.warntext,
                                               self.CustomerHeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                               action, userinfo)
-        dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+        dlg.SetIcon(wx.Icon(self.mainpagefile, self.mainpagetype))
         try:
             dlg.ShowModal()
         finally:
@@ -215,7 +213,7 @@ class CustMgmtSystem(wx.Dialog):
                                                   self.custimgdir, self.imginfo, self.dbname, self.custtable, self.warntext,
                                                   self.CustomerHeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                                   action, userinfo)
-            dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+            dlg.SetIcon(wx.Icon(self.mainpagefile, self.mainpagetype))
             try:
                 dlg.ShowModal()
             finally:
@@ -262,22 +260,24 @@ class CustMgmtSystem(wx.Dialog):
     def OnItemSelect(self, event):
         self.currentItem = self.CustList.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 
-        userinfo = self.alluserinfo[self.currentItem]
-        userid_pic = string.zfill(userinfo[0], 6)
-        #userpicture = '%s/%s.png'%(self.custimgdir, userid_pic)
-        listpictures = glob('%s/%s.*'%(self.custimgdir, userid_pic))
-        #print userinfo, userid_pic, self.custimgdir, listpictures
-        if listpictures:
-            custpicture = listpictures[0]
-            if path.isfile(custpicture):
-                self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                      self.imginfo.GetImageInfo('custpicture', custpicture)
-                #print fgimagefilename, fgimage, fgimagesize, custpicture
-        else:
-            self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                  self.imginfo.GetImageInfo('custpicture', self.custpicturefile)
+        if self.currentItem != -1:
+            userinfo = self.alluserinfo[self.currentItem]
+            userid_pic = string.zfill(userinfo[0], 6)
+            #userpicture = '%s/%s.png'%(self.custimgdir, userid_pic)
+            listpictures = glob('%s/%s.*'%(self.custimgdir, userid_pic))
+            #print userinfo, userid_pic, self.custimgdir, listpictures
+            if listpictures:
+                custpicture = listpictures[0]
+                if not path.isfile(custpicture):
+                    custpicture = self.custpicturefile
+            else:
+                custpicture = self.custpicturefile
 
-        self.CustImageButton.SetBitmap(self.fgimage)
+            self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
+                                  self.imginfo.GetImageInfo('custpicture', custpicture)
+            #print fgimagefilename, fgimage, fgimagesize, custpicture
+
+            self.CustImageButton.SetBitmap(self.fgimage)
 
         return
 
@@ -398,7 +398,7 @@ class CustMgmtSystem(wx.Dialog):
                                                   self.custimgdir, self.imginfo, self.dbname, self.custtable, self.warntext,
                                                   self.CustomerHeaderList, self.joblist, self.yearlist, self.monthlist, self.daylist,
                                                   action, userinfo)
-            dlg.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+            dlg.SetIcon(wx.Icon(self.mainpagefile, self.mainpagetype))
             try:
                 dlg.ShowModal()
             finally:
@@ -448,7 +448,7 @@ class CustMgmtSystem(wx.Dialog):
             msg = u'請先選擇一個用戶進行轉換！'
 
         dialog = wx.MessageDialog(self, msg, u'警告', wx.OK | wx.ICON_INFORMATION)
-        dialog.SetIcon(wx.Icon(self.mainpagefile, wx.BITMAP_TYPE_PNG))
+        dialog.SetIcon(wx.Icon(self.mainpagefile, self.mainpagetype))
         result = dialog.ShowModal()
 
         return

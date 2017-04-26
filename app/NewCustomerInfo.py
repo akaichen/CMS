@@ -12,7 +12,7 @@ def create(parent):
     return NewCustomerInfo(parent)
 
 [wxID_NEWCUSTOMERINFO, wxID_BITMAPCMSMAINPAGE, 
- wxID_NEWCUSTOMERINFOPANEL1, wxID_NEWCUSTOMERINFOPAGEHEADER, 
+ wxID_NEWCUSTOMERINFOPAGEHEADER, 
  wxID_NEWCUSTOMERINFODEALERHEADER, wxID_NEWCUSTOMERINFODEALERTEXT, 
  wxID_NEWCUSTOMERINFOJOBLEVELHEADER, wxID_NEWCUSTOMERINFOJOBLEVELTEXT, 
  wxID_NEWCUSTOMERINFONAMEHEADER, wxID_NEWCUSTOMERINFONAMETEXT,
@@ -33,7 +33,7 @@ def create(parent):
  wxID_NEWCUSTOMERINFOBIRTHDAYMONTHTEXT, wxID_NEWCUSTOMERINFOBIRTHDAYMONTHHEADER,
  wxID_NEWCUSTOMERINFOBIRTHDAYDAYTEXT, wxID_NEWCUSTOMERINFOBIRTHDAYDAYHEADER,
  wxID_BITMAPCUSTPICTURE, wxID_CMSMAINDIALOGWARNINGTEXT, 
-] = [wx.NewId() for _init_ctrls in range(44)]
+] = [wx.NewId() for _init_ctrls in range(43)]
 
 class NewCustomerInfo(wx.Dialog):
     def _init_ctrls(self, prnt, title, joblist, yearlist, monthlist, daylist):
@@ -44,13 +44,10 @@ class NewCustomerInfo(wx.Dialog):
               title=title)
         self.SetClientSize(self.mainwin)
 
-        self.panel1 = wx.Panel(id=wxID_NEWCUSTOMERINFOPANEL1, name='panel1',
-              parent=self, pos=wx.Point(0, 0), size=self.mainwin,
-              style=wx.TAB_TRAVERSAL)
-
         self.CMSMainPage = wx.StaticBitmap(bitmap=self.mainpage,
-              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self.panel1,
-              pos=wx.Point(0, 0), size=self.mainpagesize, style=wx.TAB_TRAVERSAL)
+              id=wxID_BITMAPCMSMAINPAGE, name='BitmapCMSMainPage', parent=self,
+              pos=wx.Point(0, 0), size=self.mainwin,
+              style=wx.ALIGN_CENTRE|wx.TAB_TRAVERSAL)
 
         #header_x = self.mainwin[0] / 2 - 75
         header_x = 20
@@ -74,7 +71,8 @@ class NewCustomerInfo(wx.Dialog):
 
         self.DealerText = wx.TextCtrl(id=wxID_NEWCUSTOMERINFODEALERTEXT,
               name='DealerText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 80),
-              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.DealerText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -111,7 +109,8 @@ class NewCustomerInfo(wx.Dialog):
 
         self.NameText = wx.TextCtrl(id=wxID_NEWCUSTOMERINFONAMETEXT,
               name='NameText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 160),
-              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.NameText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -125,7 +124,8 @@ class NewCustomerInfo(wx.Dialog):
 
         self.SpouseText = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOSPOUSETEXT,
               name='SpouseText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 200),
-              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.SpouseText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -195,7 +195,8 @@ class NewCustomerInfo(wx.Dialog):
 
         self.JobtitleText = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOJOBTITLETEXT,
               name='JobtitleText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 280),
-              size=wx.Size(200, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(200, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.JobtitleText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -210,7 +211,8 @@ class NewCustomerInfo(wx.Dialog):
         teltext1_x = split_x_1 + col2_extend
         self.TelephoneText1 = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOTELEPHONETEXT1,
               name='TelephoneText1', parent=self.CMSMainPage, pos=wx.Point(teltext1_x, 320),
-              size=wx.Size(60, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(60, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.TelephoneText1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -225,7 +227,8 @@ class NewCustomerInfo(wx.Dialog):
         teltext2_x = telspliter1_x + 22
         self.TelephoneText2 = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOTELEPHONETEXT2,
               name='TelephoneText2', parent=self.CMSMainPage, pos=wx.Point(teltext2_x, 320),
-              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.TelephoneText2.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -240,7 +243,8 @@ class NewCustomerInfo(wx.Dialog):
         teltext3_x = telspliter2_x + 62
         self.TelephoneText3 = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOTELEPHONETEXT3,
               name='TelephoneText3', parent=self.CMSMainPage, pos=wx.Point(teltext3_x, 320),
-              size=wx.Size(70, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(70, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.TelephoneText3.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -255,7 +259,8 @@ class NewCustomerInfo(wx.Dialog):
         celltext1_x = split_x_1 + col2_extend
         self.CellphoneText1 = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOCELLPHONETEXT1,
               name='CellphoneText1', parent=self.CMSMainPage, pos=wx.Point(celltext1_x, 360),
-              size=wx.Size(60, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(60, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.CellphoneText1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -270,7 +275,8 @@ class NewCustomerInfo(wx.Dialog):
         celltext2_x = cellspliter1_x + 22
         self.CellphoneText2 = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOCELLPHONETEXT2,
               name='CellphoneText2', parent=self.CMSMainPage, pos=wx.Point(celltext2_x, 360),
-              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.CellphoneText2.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -284,7 +290,8 @@ class NewCustomerInfo(wx.Dialog):
 
         self.AreaText = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOAREATEXT,
               name='AreaText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 400),
-              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.AreaText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -300,7 +307,8 @@ class NewCustomerInfo(wx.Dialog):
         address_size = 500
         self.AddressText = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOADDRESSTEXT,
               name='AddressText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 440),
-              size=wx.Size(address_size, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(address_size, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.AddressText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -314,7 +322,8 @@ class NewCustomerInfo(wx.Dialog):
 
         self.MailText = wx.TextCtrl(id=wxID_NEWCUSTOMERINFOMAILTEXT,
               name='MailText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 480),
-              size=wx.Size(350, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(350, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.MailText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -328,7 +337,8 @@ class NewCustomerInfo(wx.Dialog):
 
         self.RecommendedText = wx.TextCtrl(id=wxID_NEWCUSTOMERINFORECOMMENDEDTEXT,
               name='RecommendedText', parent=self.CMSMainPage, pos=wx.Point(split_x_1 + col2_extend, 520),
-              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER | wx.TE_RICH, value='')
+              size=wx.Size(150, 25), style=wx.TE_PROCESS_ENTER|wx.TE_RICH,
+              value='')
         self.RecommendedText.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
@@ -352,7 +362,7 @@ class NewCustomerInfo(wx.Dialog):
         self.WarningText = wx.StaticText(id=wxID_CMSMAINDIALOGWARNINGTEXT,
               label=self.warntext, name='WarningText', parent=self.CMSMainPage,
               pos=warnpoint, size=wx.Size(200, 13),
-              style=wx.ALIGN_RIGHT)
+              style=wx.ALIGN_LEFT)
         self.WarningText.SetFont(wx.Font(8, wx.SWISS, wx.NORMAL, wx.NORMAL,
               False, u'新細明體'))
         self.WarningText.SetForegroundColour((144, 144, 144))
@@ -385,7 +395,7 @@ class NewCustomerInfo(wx.Dialog):
         self.monthlist = monthlist
         self.daylist = daylist
 
-        self.fgimagefilename, self.fgimage, self.fgimagesize = \
+        self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
                               self.imginfo.GetImageInfo('custpicture', self.custpicturefile)
         #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.custpicturefile
 
@@ -421,12 +431,14 @@ class NewCustomerInfo(wx.Dialog):
             listpictures = glob('%s/%s.*'%(self.imagedir, userid_pic))
             if listpictures:
                 self.custpicture = listpictures[0]
-                if path.isfile(self.custpicture):
-                    self.fgimagefilename, self.fgimage, self.fgimagesize = \
-                                          self.imginfo.GetImageInfo('custpicture', self.custpicture)
-                    #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.custpicture
+                if not path.isfile(self.custpicture):
+                    self.custpicture = self.custpicturefile
             else:
-                self.custpicture = '%s/%s.png'%(self.imagedir, self.custpicturefile)
+                self.custpicture = self.custpicturefile
+
+            self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
+                                  self.imginfo.GetImageInfo('custpicture', self.custpicture)
+            #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.custpicture
 
         self.CustPicture.SetBitmap(self.fgimage)
 
@@ -480,7 +492,7 @@ class NewCustomerInfo(wx.Dialog):
         self.newcustpicture = self.imginfo.GetNewImageFile()
         if self.newcustpicture != '':
             self.CustPicture.SetBitmap(wx.NullBitmap)
-            self.fgimagefilename, self.fgimage, self.fgimagesize = \
+            self.fgimagefilename, self.fgimage, self.fgimagesize, self.fgimagetype = \
                                   self.imginfo.GetImageInfo('custpicture', self.newcustpicture)
             #print self.fgimagefilename, self.fgimage, self.fgimagesize, self.newcustpicture
             self.CustPicture.SetBitmap(self.fgimage)
@@ -634,22 +646,26 @@ class NewCustomerInfo(wx.Dialog):
             db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
             info = db.ConnectDB()
         except:
-            print 'Insert into database error'
+            print '%s into database error'%sqlaction
             print sqlcmd
             info = 'error'
         
         if info != 'error':
             if self.newcustpicture != '':
-                if self.custpicture == '':
+                if self.action == 'add':
                     userid = self.GetNewUserId()
-                    print userid
-                    if userid != '':
-                        userid_pic = string.zfill(userid, 6)
-                        self.custpicture = '%s/%s.png'%(self.imagedir, userid_pic)
+                elif self.action == 'modify':
+                    userid = self.userinfo[0]
+                print 'user id:  ', userid
+                if userid != '':
+                    userid_pic = string.zfill(userid, 6)
+                    listpictures = glob('%s/%s.*'%(self.imagedir, userid_pic))
+                    if listpictures:
+                        self.custpicture = listpictures[0]
                     else:
-                        self.custpicture = self.custpicturefile
-                #print self.newcustpicture, self.custpicture
-                self.newcustpicture = self.imginfo.CopyNewImageFile(self.newcustpicture, self.custpicture)
+                        self.custpicture = '%s/%s.png'%(self.imagedir, userid_pic)
+                    #print self.newcustpicture, self.custpicture
+                    self.newcustpicture = self.imginfo.CopyNewImageFile(self.newcustpicture, self.custpicture)
 
         self.Close()
         event.Skip()
