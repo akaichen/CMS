@@ -12,14 +12,27 @@ python setup.py py2exe
 del CMS.pyw
 
 copy MSVCP90.DLL dist\
-xcopy /E /Y dbdir dist\dbdir\
-xcopy /E /Y imgdir dist\imgdir\
+
+mkdir dist\dbdir\
+copy dbdir\customerinfo-default.mdb dist\dbdir\customerinfo.mdb
+
+mkdir dist\imgdir\
+copy imgdir\custpicture.png dist\imgdir\
+copy imgdir\mainpage.png    dist\imgdir\
+copy imgdir\prodpicture.png dist\imgdir\
+xcopy /E /Y /I imgdir\prod-pro dist\imgdir\prod
+
+rem xcopy /E /Y dbdir dist\dbdir\
+rem xcopy /E /Y imgdir dist\imgdir\
 
 mkdir cms\
 
 rmdir /S /Q build\
 move dist cms\
 
-call cms\dist\CMS.exe
+cd cms\dist\
 
-call cms\dist\CMS.exe.log
+call CMS.exe
+call CMS.exe.log
+
+cd ..\..\

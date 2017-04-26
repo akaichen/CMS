@@ -54,6 +54,7 @@ class BoaApp(wx.App):
         self.imgdata['PROD']['HEIGHT']     = 300
         self.imgdata['PROD']['PRODDIR']    = proddir
 
+        mainpagefile   = self.imgdata['MAIN']['FILENAME']
         csmainpagefile = self.imgdata['MAIN']['CSFILENAME']
         mainfilename, mainfileext = path.splitext(csmainpagefile)
         listpictures = glob('%s.*'%(mainfilename))
@@ -61,9 +62,9 @@ class BoaApp(wx.App):
         if listpictures:
             self.iconimagefile = listpictures[0]
             if not path.isfile(self.iconimagefile):
-                self.iconimagefile = self.mainpagefile
+                self.iconimagefile = mainpagefile
         else:
-            self.iconimagefile = self.mainpagefile
+            self.iconimagefile = mainpagefile
 
         imginfo = GetImageInfo.GetImageInfo(self.imgdata)
         self.iconimagetype = imginfo.GetImageType(self.iconimagefile)

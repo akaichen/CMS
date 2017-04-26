@@ -74,7 +74,7 @@ class CustMgmtSystem(wx.Dialog):
         query_y = 10
         self.QueryCustomer = wx.SearchCtrl(id=wxID_CUSTMGMTSYSTEMGENQUERYCUSTOMER,
               name='QueryCustomer', parent=self.CMSMainPage, pos=wx.Point(query_x, query_y),
-              size=wx.Size(250, 30), style=0, value='')
+              size=wx.Size(250, 30), style=wx.TE_PROCESS_ENTER, value='')
         self.QueryCustomer.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
         self.QueryCustomer.ShowSearchButton(True)
@@ -348,16 +348,15 @@ class CustMgmtSystem(wx.Dialog):
             sqlcmd = '''SELECT * FROM %s
                         WHERE Customer_SaleType = '%s' AND Customer_JobLevel = '%s'
                     '''%(self.custtable, membertype, searchname)
-            #print sqlcmd
         else:
             sqlcmd = '''SELECT * FROM %s
                         WHERE Customer_SaleType = '%s' AND (
                                 Customer_Name LIKE '%s' OR Customer_JobTitle LIKE '%s'
                                 OR Customer_Telephone LIKE '%s' OR Customer_Cellphone LIKE '%s'
-                                )
+                                OR Customer_Area LIKE '%s' OR Customer_JobLevel LIKE '%s' )
                     '''%(self.custtable, membertype,
-                         '%'+searchname+'%', '%'+searchname+'%',
-                         '%'+searchname+'%', '%'+searchname+'%')
+                         '%'+searchname+'%', '%'+searchname+'%', '%'+searchname+'%',
+                         '%'+searchname+'%', '%'+searchname+'%', '%'+searchname+'%')
 
         try:
             db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)

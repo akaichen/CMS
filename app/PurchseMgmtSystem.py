@@ -328,28 +328,11 @@ class PurchseMgmtSystem(wx.Dialog):
                 self.PurchseList.SetStringItem(listid, 1, u'%s'%format(int(purprice), ','))
                 self.PurchseList.SetStringItem(listid, 2, u'%s'%format(int(totalpoint), ','))
                 listid += 1
-                continue
 
-
-                cid = 0
-                hidlist = self.PurchseHeaderId.keys()
-                hidlist.sort()
-                #print hidlist
-                for id in hidlist:
-                    if id == 0:
-                        continue
-                    print listid, id, cid, purinfo[id]
-                    if id == 2:
-                        totalpoint += purinfo[id]
-                    if hidlist.index(id) == 1:
-                        self.PurchseList.InsertStringItem(listid, u'%s'%purinfo[id])
-                    else:
-                        self.PurchseList.SetStringItem(listid, cid, u'%s'%purinfo[id])
-                    if id == len(hidlist):
-                        print totalpoint
-                    cid += 1
-                listid += 1
-                #print totalpoint
+            ### 新增最後一筆記錄：年度總計
+            self.PurchseList.InsertStringItem(listid, u'年度總計')
+            self.PurchseList.SetStringItem(listid, 1, u'%s'%format(int(totalpoint), ','))
+            self.PurchseList.SetStringItem(listid, 2, u'')
 
         return
 
