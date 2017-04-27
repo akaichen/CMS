@@ -14,7 +14,8 @@ del CMS.pyw
 copy MSVCP90.DLL dist\
 
 mkdir dist\dbdir\
-copy dbdir\customerinfo-default.mdb dist\dbdir\customerinfo.mdb
+rem copy dbdir\customerinfo-default.mdb dist\dbdir\customerinfo.mdb
+copy dbdir\customerinfo-pro.mdb dist\dbdir\customerinfo.mdb
 
 mkdir dist\imgdir\
 copy imgdir\custpicture.png dist\imgdir\

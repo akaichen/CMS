@@ -140,10 +140,10 @@ class CustMgmtSystem(wx.Dialog):
         self.mainpagetype = self.imginfo.GetImageType(self.mainpagefile)
         self.custimgdir = self.imginfo.GetCustImageDir()
 
-        sysinfo = GetSysInfo.GetSysInfo(self.membertype)
-        self.CustomerHeaderList, self.CustomerHeaderId = sysinfo.GetCustomerHeaderList('customer')
-        self.joblist, self.queryjoblist = sysinfo.GetJobLevelList()
-        self.yearlist, self.monthlist, self.daylist = sysinfo.GetDateList()
+        self.sysinfo = GetSysInfo.GetSysInfo()
+        self.CustomerHeaderList, self.CustomerHeaderId = self.sysinfo.GetCustomerHeaderList(self.membertype, 'customer')
+        self.joblist, self.queryjoblist = self.sysinfo.GetJobLevelList()
+        self.yearlist, self.monthlist, self.daylist = self.sysinfo.GetDateList()
 
         self._init_ctrls(parent, self.queryjoblist)
         self.Center()
@@ -175,7 +175,7 @@ class CustMgmtSystem(wx.Dialog):
 
         self.CustImageButton.SetBitmap(self.fgimage)
 
-        self.alluserinfo = self.GetAllUserInfo(self.membertype, '')
+        self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, '')
         #print self.alluserinfo
         self.CreatHeader()
         self.InitData(self.membertype, self.alluserinfo)
@@ -194,7 +194,7 @@ class CustMgmtSystem(wx.Dialog):
         finally:
             dlg.Destroy()
 
-        self.alluserinfo = self.GetAllUserInfo(self.membertype, '')
+        self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, '')
         #print self.alluserinfo
         self.InitData(self.membertype, self.alluserinfo)
 
@@ -220,7 +220,7 @@ class CustMgmtSystem(wx.Dialog):
                 dlg.Destroy()
 
             searchname = self.QueryCustomer.GetValue()
-            self.alluserinfo = self.GetAllUserInfo(self.membertype, searchname)
+            self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, searchname)
             #print self.alluserinfo
             self.InitData(self.membertype, self.alluserinfo)
 
@@ -232,7 +232,7 @@ class CustMgmtSystem(wx.Dialog):
         if searchname == '':
             self.ShowNoItemSelectMessage('QUERYFAILED')
         else:
-            self.alluserinfo = self.GetAllUserInfo(self.membertype, searchname)
+            self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, searchname)
             # print self.alluserinfo
             self.InitData(self.membertype, self.alluserinfo)
 
@@ -247,7 +247,7 @@ class CustMgmtSystem(wx.Dialog):
     def OnQueryCustomerCTN(self, event):
         #print 'Clear search string'
         self.QueryCustomer.Clear()
-        self.alluserinfo = self.GetAllUserInfo(self.membertype, '')
+        self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, '')
         # print self.alluserinfo
         self.InitData(self.membertype, self.alluserinfo)
 
@@ -336,49 +336,14 @@ class CustMgmtSystem(wx.Dialog):
 
         return
 
-    def GetAllUserInfo(self, membertype, searchname):
-        alluserinfo = []
-        sqlaction = 'select'
-        if searchname == '':
-            sqlcmd = '''SELECT * FROM %s
-                        WHERE Customer_SaleType = '%s'
-                    '''%(self.custtable, membertype)
-        elif searchname in range(0, len(self.queryjoblist)):
-            searchname = self.queryjoblist[searchname]
-            sqlcmd = '''SELECT * FROM %s
-                        WHERE Customer_SaleType = '%s' AND Customer_JobLevel = '%s'
-                    '''%(self.custtable, membertype, searchname)
-        else:
-            sqlcmd = '''SELECT * FROM %s
-                        WHERE Customer_SaleType = '%s' AND (
-                                Customer_Name LIKE '%s' OR Customer_JobTitle LIKE '%s'
-                                OR Customer_Telephone LIKE '%s' OR Customer_Cellphone LIKE '%s'
-                                OR Customer_Area LIKE '%s' OR Customer_JobLevel LIKE '%s' )
-                    '''%(self.custtable, membertype,
-                         '%'+searchname+'%', '%'+searchname+'%', '%'+searchname+'%',
-                         '%'+searchname+'%', '%'+searchname+'%', '%'+searchname+'%')
-
-        try:
-            db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
-            info = db.ConnectDB()
-            alluserinfo = info
-            #print 'Query user info:  '
-            #print alluserinfo
-        except:
-            print 'Query database error'
-            print sqlcmd
-            info = 'error'
-        
-        return alluserinfo
-
     def OnQueryJobLevel(self, event):
         searchselect = self.QueryJobLevel.GetSelection()
         if searchselect != 0:
-            self.alluserinfo = self.GetAllUserInfo(self.membertype, searchselect)
+            self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, searchselect)
             #print self.alluserinfo
         else:
             searchname = ''
-            self.alluserinfo = self.GetAllUserInfo(self.membertype, searchname)
+            self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, searchname)
             #print self.alluserinfo
         self.InitData(self.membertype, self.alluserinfo)
 
@@ -404,7 +369,7 @@ class CustMgmtSystem(wx.Dialog):
                 dlg.Destroy()
 
             searchname = self.QueryCustomer.GetValue()
-            self.alluserinfo = self.GetAllUserInfo(self.membertype, searchname)
+            self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, searchname)
             #print self.alluserinfo
             self.InitData(self.membertype, self.alluserinfo)
 
@@ -432,7 +397,7 @@ class CustMgmtSystem(wx.Dialog):
                 info = 'error'
 
             searchname = self.QueryCustomer.GetValue()
-            self.alluserinfo = self.GetAllUserInfo(self.membertype, searchname)
+            self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, searchname)
             #print self.alluserinfo
             self.InitData(self.membertype, self.alluserinfo)
 

@@ -7,7 +7,6 @@ import wx
 import wx.lib.buttons
 
 import GetSysInfo
-import ConnectDB
 import NewProduct
 
 def create(parent):
@@ -109,8 +108,8 @@ class ProductMgmtSystem(wx.Dialog):
         self.mainpagetype = self.imginfo.GetImageType(self.mainpagefile)
         self.prodimgdir = self.imginfo.GetProdImageDir()
 
-        sysinfo = GetSysInfo.GetSysInfo(self.membertype)
-        self.ProductHeaderList, self.ProductHeaderId = sysinfo.GetProductHeaderList()
+        self.sysinfo = GetSysInfo.GetSysInfo()
+        self.ProductHeaderList, self.ProductHeaderId = self.sysinfo.GetProductHeaderList()
 
         self._init_ctrls(parent, self.producttitle)
         self.Center()
@@ -128,7 +127,7 @@ class ProductMgmtSystem(wx.Dialog):
 
         self.ProdImageButton.SetBitmap(self.fgimage)
 
-        self.allprodinfo = self.GetAllProductInfo()
+        self.allprodinfo = self.sysinfo.GetAllProductInfo(self.dbname, self.prodtable)
         #print self.allprodinfo
         self.CreatHeader()
         self.InitData(self.membertype, self.allprodinfo)
@@ -146,7 +145,7 @@ class ProductMgmtSystem(wx.Dialog):
         finally:
             dlg.Destroy()
 
-        self.allprodinfo = self.GetAllProductInfo()
+        self.allprodinfo = self.sysinfo.GetAllProductInfo(self.dbname, self.prodtable)
         #print self.allprodinfo
         self.InitData(self.membertype, self.allprodinfo)
 
@@ -170,7 +169,7 @@ class ProductMgmtSystem(wx.Dialog):
             finally:
                 dlg.Destroy()
 
-            self.allprodinfo = self.GetAllProductInfo()
+            self.allprodinfo = self.sysinfo.GetAllProductInfo(self.dbname, self.prodtable)
             #print self.allprodinfo
             self.InitData(self.membertype, self.allprodinfo)
 
@@ -219,27 +218,6 @@ class ProductMgmtSystem(wx.Dialog):
     def OnExitButton(self, event):
         self.Close()
         event.Skip()
-
-    def GetAllProductInfo(self):
-        allprodinfo = []
-        sqlaction = 'select'
-        searchname = ''
-        if searchname == '':
-            sqlcmd = '''SELECT * FROM %s
-                    '''%(self.prodtable)
-
-        try:
-            db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
-            info = db.ConnectDB()
-            allprodinfo = info
-            #print 'Query user info:  '
-            #print allprodinfo
-        except:
-            print 'Query database error'
-            print sqlcmd
-            info = 'error'
-        
-        return allprodinfo
 
     def CreatHeader(self):
         #print 'Create list header'

@@ -2,9 +2,11 @@
 
 import datetime
 
+import ConnectDB
+
 class GetSysInfo:
-    def __init__(self, membertype):
-        self.membertype = membertype
+    def __init__(self):
+        pass
 
     def GetPurchseHeaderList(self):
         PurchseHeaderList = [u'購買月份', u'月積分',
@@ -31,7 +33,19 @@ class GetSysInfo:
 
         return ProductHeaderList, ProductHeaderId
 
-    def GetCustomerHeaderList(self, gettype):
+    def GetContentHeaderList(self):
+        ContentHeaderList = [u'時間', u'類別',
+                             u'姓名', u'內容']
+
+        ContentHeaderId    = {}
+        ContentHeaderId[0] = 100
+        ContentHeaderId[1] = 100
+        ContentHeaderId[2] = 100
+        ContentHeaderId[3] = 600
+
+        return ContentHeaderList, ContentHeaderId
+
+    def GetCustomerHeaderList(self, membertype, gettype):
         CustomerHeaderList = []
         CustomerHeaderId = {}
         if gettype == 'customer':
@@ -43,14 +57,14 @@ class GetSysInfo:
                           u'e-Mail', u'推薦人']
             # 職級(上聘年月)
 
-            if self.membertype in ['Member', 'All']:
+            if membertype in ['Member', 'All']:
                 CustomerHeaderId[0] = 100
                 CustomerHeaderId[1] = 70
                 CustomerHeaderId[2] = 100
                 CustomerHeaderId[6] = 130
                 CustomerHeaderId[7] = 130
                 CustomerHeaderId[8] = 100
-            elif self.membertype == 'Nonmember':
+            elif membertype == 'Nonmember':
                 CustomerHeaderId[2] = 100
                 CustomerHeaderId[6] = 130
                 CustomerHeaderId[7] = 130
@@ -72,15 +86,26 @@ class GetSysInfo:
         return CustomerHeaderList, CustomerHeaderId
 
     def GetJobLevelList(self):
-        alljoblist = [u'會員', u'主任',
-                      u'副理', u'經理', u'松柏',
-                      u'長青', u'珍珠', u'翡翠',
+        alljoblist = [u'會員', u'主任', 
+                      u'副理', u'經理', 
+                      u'松柏', u'長青', 
+                      u'珍珠', u'翡翠', 
                       u'藍鑽']
 
         joblist = [u'請選擇'] + alljoblist
         queryjoblist = [u'選擇顯示職級'] + alljoblist
 
         return joblist, queryjoblist
+
+    def GetQueryContentList(self):
+        allconlist = [u'HP', u'NDS', 
+                      u'春訓', u'表揚會', 
+                      u'組織活動', u'平日作業']
+
+        conlist = [u'請選擇'] + allconlist
+        queryconlist = [u'選擇顯示類別'] + allconlist
+
+        return conlist, queryconlist
 
     def GetDateList(self):
         currentTime = datetime.datetime.now()
@@ -100,4 +125,88 @@ class GetSysInfo:
             daylist.append('%s'%dayname)
 
         return yearlist, monthlist, daylist
+
+    def GetAllUserInfo(self, dbname, membertype, custtable, queryjoblist, searchname):
+        alluserinfo = []
+        sqlaction = 'select'
+        if membertype == '':
+            if searchname == '':
+                sqlcmd = '''SELECT Customer_Name FROM %s
+                        '''%(custtable)
+        else:
+            if searchname in range(0, len(queryjoblist)):
+                searchname = queryjoblist[searchname]
+                sqlcmd = '''SELECT * FROM %s
+                            WHERE Customer_SaleType = '%s' AND Customer_JobLevel = '%s'
+                        '''%(custtable, membertype, searchname)
+            elif searchname == '':
+                sqlcmd = '''SELECT * FROM %s
+                            WHERE Customer_SaleType = '%s'
+                        '''%(custtable, membertype)
+            else:
+                sqlcmd = '''SELECT * FROM %s
+                            WHERE Customer_SaleType = '%s' AND (
+                                    Customer_Name LIKE '%s' OR Customer_JobTitle LIKE '%s'
+                                    OR Customer_Telephone LIKE '%s' OR Customer_Cellphone LIKE '%s'
+                                    OR Customer_Area LIKE '%s' OR Customer_JobLevel LIKE '%s' )
+                        '''%(custtable, membertype,
+                             '%'+searchname+'%', '%'+searchname+'%', '%'+searchname+'%',
+                             '%'+searchname+'%', '%'+searchname+'%', '%'+searchname+'%')
+
+        try:
+            db = ConnectDB.ConnectDB(dbname, sqlaction, sqlcmd)
+            info = db.ConnectDB()
+            alluserinfo = info
+            #print 'Query user info:  '
+            #print alluserinfo
+        except:
+            print 'Query database error'
+            print sqlcmd
+            info = 'error'
+        
+        return alluserinfo
+
+    def GetAllProductInfo(self, dbname, prodtable):
+        allprodinfo = []
+        sqlaction = 'select'
+        sqlcmd = '''SELECT * FROM %s
+                '''%(prodtable)
+
+        try:
+            db = ConnectDB.ConnectDB(dbname, sqlaction, sqlcmd)
+            info = db.ConnectDB()
+            allprodinfo = info
+            #print 'Query user info:  '
+            #print allprodinfo
+        except:
+            print 'Query database error'
+            print sqlcmd
+            info = 'error'
+        
+        return allprodinfo
+
+    def GetAllFollowInfo(self, dbname, followtable, searchname):
+        allfollowinfo = []
+        sqlaction = 'select'
+        if searchname == '':
+            sqlcmd = '''SELECT * FROM %s
+                        '''%(followtable)
+        else:
+            sqlcmd = '''SELECT * FROM %s
+                        WHERE Follow_Category = '%s'
+                        '''%(followtable, searchname)
+
+        try:
+            db = ConnectDB.ConnectDB(dbname, sqlaction, sqlcmd)
+            info = db.ConnectDB()
+            allfollowinfo = info
+            #print 'Query user info:  '
+            #print alluserinfo
+        except:
+            print 'Query database error'
+            print sqlcmd
+            info = 'error'
+        
+        return allfollowinfo
+
 

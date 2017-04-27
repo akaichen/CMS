@@ -20,11 +20,12 @@ class BoaApp(wx.App):
             mkdir(dbdir)
 
         self.dbdata = {}
-        self.dbdata['DBDIR']     = dbdir
-        self.dbdata['DBNAME']    = '%s\\customerinfo.mdb'%self.dbdata['DBDIR']
-        self.dbdata['CUSTTABLE'] = 'CustomerInformation'
-        self.dbdata['PRODTABLE'] = 'ProductInformation'
-        self.dbdata['SALETABLE'] = 'SaleInformation'
+        self.dbdata['DBDIR']       = dbdir
+        self.dbdata['DBNAME']      = '%s\\customerinfo.mdb'%self.dbdata['DBDIR']
+        self.dbdata['CUSTTABLE']   = 'CustomerInformation'
+        self.dbdata['PRODTABLE']   = 'ProductInformation'
+        self.dbdata['SALETABLE']   = 'SaleInformation'
+        self.dbdata['FOLLOWTABLE'] = 'FollowInformation'
 
         imgdir = '%s\\imgdir'%self.workdir
         if not path.isdir(imgdir):

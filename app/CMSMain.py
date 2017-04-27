@@ -109,11 +109,12 @@ class CMSMainDialog(wx.Dialog):
         self.dbdata  = dbdata
         self.imgdata = imgdata
 
-        self.dbdir      = self.dbdata['DBDIR']
-        self.dbfilename = self.dbdata['DBNAME']
-        self.custtable  = self.dbdata['CUSTTABLE']
-        self.prodtable  = self.dbdata['PRODTABLE']
-        self.saletable  = self.dbdata['SALETABLE']
+        self.dbdir       = self.dbdata['DBDIR']
+        self.dbfilename  = self.dbdata['DBNAME']
+        self.custtable   = self.dbdata['CUSTTABLE']
+        self.prodtable   = self.dbdata['PRODTABLE']
+        self.saletable   = self.dbdata['SALETABLE']
+        self.followtable = self.dbdata['FOLLOWTABLE']
 
         self.imagedir        = self.imgdata['IMGDIR']
         self.mainpagefile    = self.imgdata['MAIN']['FILENAME']
@@ -215,7 +216,7 @@ class CMSMainDialog(wx.Dialog):
 
     def OnFollowUpButton(self, event):
         dlg = FollowUpSystem.FollowUpSystem(self.followtitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
-                                            self.bgimagesize, self.imagedir, self.imginfo,
+                                            self.bgimagesize, self.imagedir, self.imginfo, self.dbname, self.custtable, self.followtable,
                                             self.warntext)
         dlg.SetIcon(wx.Icon(self.bgimagefile, self.bgimagetype))
         try:
@@ -237,8 +238,10 @@ class CMSMainDialog(wx.Dialog):
             #print selectfilename, self.csmainpagefile
             self.bgimagefilename, self.bgimage, self.bgimagesize, self.bgimagetype = \
                                   self.imginfo.GetImageInfo('mainpage', self.csmainpagefile)
+            self.bgimagefile = self.csmainpagefile
             #print self.bgimagesize
             self.CMSMainPage.SetBitmap(self.bgimage)
+            self.SetIcon(wx.Icon(self.bgimagefile, self.bgimagetype))
 
         return
 

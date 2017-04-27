@@ -22,7 +22,7 @@ class PurchseMgmtSystem(wx.Dialog):
     def _init_ctrls(self, prnt, purchsetitle):
         # generated method, don't edit
         wx.Dialog.__init__(self, id=wxID_PURCHSEMGMTSYSTEM,
-              name='PURCHSEMgmtSystem', parent=prnt, pos=wx.Point(284, 86),
+              name='PurchseMgmtSystem', parent=prnt, pos=wx.Point(284, 86),
               size=self.mainwin, style=wx.DEFAULT_DIALOG_STYLE | wx.CAPTION | wx.THICK_FRAME,
               title=purchsetitle)
         self.SetClientSize(self.mainwin)
@@ -104,10 +104,10 @@ class PurchseMgmtSystem(wx.Dialog):
         self.saletable = saletable
         self.warntext = warntext
 
-        sysinfo = GetSysInfo.GetSysInfo(self.membertype)
-        self.CustomerHeaderList, self.CustomerHeaderId = sysinfo.GetCustomerHeaderList('purchse')
-        self.ProductHeaderList, self.ProductHeaderId = sysinfo.GetProductHeaderList()
-        self.PurchseHeaderList, self.PurchseHeaderId = sysinfo.GetPurchseHeaderList()
+        self.sysinfo = GetSysInfo.GetSysInfo()
+        self.CustomerHeaderList, self.CustomerHeaderId = self.sysinfo.GetCustomerHeaderList(self.membertype, 'purchse')
+        self.ProductHeaderList, self.ProductHeaderId = self.sysinfo.GetProductHeaderList()
+        self.PurchseHeaderList, self.PurchseHeaderId = self.sysinfo.GetPurchseHeaderList()
 
         self.mainpagetype = self.imginfo.GetImageType(self.mainpagefile)
         self.prodimgdir = self.imginfo.GetProdImageDir()
