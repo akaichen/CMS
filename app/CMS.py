@@ -26,6 +26,7 @@ class BoaApp(wx.App):
         self.dbdata['PRODTABLE']   = 'ProductInformation'
         self.dbdata['SALETABLE']   = 'SaleInformation'
         self.dbdata['FOLLOWTABLE'] = 'FollowInformation'
+        self.dbdata['BACKUPTABLE'] = 'BackupInformation'
 
         imgdir = '%s\\imgdir'%self.workdir
         if not path.isdir(imgdir):

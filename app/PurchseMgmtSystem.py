@@ -133,7 +133,7 @@ class PurchseMgmtSystem(wx.Dialog):
         self.allprodinfo = self.GetProductList()
         self.alluserinfo = self.GetAllUserInfo('alluser', '')
         #print self.alluserinfo
-        self.CreatHeader()
+        self.CreateHeader()
         self.InitData(self.membertype, self.alluserinfo)
         
     def OnPurchseProduct(self, event):
@@ -244,7 +244,7 @@ class PurchseMgmtSystem(wx.Dialog):
             #print 'Query user info:  '
             #print alluserinfo
         except:
-            print 'Query database error'
+            print 'Access database error %s'%sqlacion
             print sqlcmd
             info = 'error'
         
@@ -262,7 +262,7 @@ class PurchseMgmtSystem(wx.Dialog):
 
         return allprodinfo
 
-    def CreatHeader(self):
+    def CreateHeader(self):
         #print 'Create list header'
         cid = 0
         for id in range(0, len(self.CustomerHeaderList)):

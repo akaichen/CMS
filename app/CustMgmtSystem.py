@@ -177,7 +177,7 @@ class CustMgmtSystem(wx.Dialog):
 
         self.alluserinfo = self.sysinfo.GetAllUserInfo(self.dbname, self.membertype, self.custtable, self.queryjoblist, '')
         #print self.alluserinfo
-        self.CreatHeader()
+        self.CreateHeader()
         self.InitData(self.membertype, self.alluserinfo)
 
     def OnNewCustomer(self, event):
@@ -298,7 +298,7 @@ class CustMgmtSystem(wx.Dialog):
 
         return
 
-    def CreatHeader(self):
+    def CreateHeader(self):
         #print 'Create list header'
         cid = 0
         for id in range(0, len(self.CustomerHeaderList)):
@@ -317,6 +317,7 @@ class CustMgmtSystem(wx.Dialog):
         #print 'Clean all data'
         self.CustList.DeleteAllItems()
 
+        #print showuserinfo
         if showuserinfo:
             listid = 0
             for userinfo in showuserinfo:
@@ -392,7 +393,7 @@ class CustMgmtSystem(wx.Dialog):
                 #print 'Query user info:  '
                 #print alluserinfo
             except:
-                print 'Query database error'
+                print 'Access database error %s'%sqlacion
                 print sqlcmd
                 info = 'error'
 

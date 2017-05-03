@@ -258,7 +258,7 @@ class NewProduct(wx.Dialog):
             db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
             info = db.ConnectDB()
         except:
-            print 'Insert into database error'
+            print 'Access database error %s'%sqlacion
             print sqlcmd
             info = 'error'
 
@@ -297,7 +297,7 @@ class NewProduct(wx.Dialog):
                 prodid = info[0][0]
             #print info, prodid
         except:
-            print 'Insert into database error'
+            print 'Access database error %s'%sqlacion
             print sqlcmd
 
         return prodid

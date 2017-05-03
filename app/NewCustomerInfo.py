@@ -646,10 +646,10 @@ class NewCustomerInfo(wx.Dialog):
             db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
             info = db.ConnectDB()
         except:
-            print '%s into database error'%sqlaction
+            print 'Access database error %s'%sqlacion
             print sqlcmd
             info = 'error'
-        
+
         if info != 'error':
             if self.newcustpicture != '':
                 if self.action == 'add':
@@ -690,7 +690,7 @@ class NewCustomerInfo(wx.Dialog):
                 userid = info[0][0]
             #print info, userid
         except:
-            print 'Insert into database error'
+            print 'Access database error %s'%sqlacion
             print sqlcmd
 
         return userid

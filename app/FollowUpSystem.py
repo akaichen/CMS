@@ -120,7 +120,7 @@ class FollowUpSystem(wx.Dialog):
 
         self.allfollowinfo = self.sysinfo.GetAllFollowInfo(self.dbname, self.followtable, '')
         #print self.allfollowinfo
-        self.CreatHeader()
+        self.CreateHeader()
         self.InitData(self.allfollowinfo)
 
     def OnAddContent(self, event):
@@ -218,7 +218,7 @@ class FollowUpSystem(wx.Dialog):
 
         return namelist
 
-    def CreatHeader(self):
+    def CreateHeader(self):
         #print 'Create list header'
         cid = 0
         for id in range(0, len(self.ContentHeaderList)):

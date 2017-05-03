@@ -10,20 +10,21 @@ import CustMgmtSystem
 import ProductMgmtSystem
 import PurchseMgmtSystem
 import FollowUpSystem
+import DataBackupSystem
 
 def create(parent):
     return CMSMainDialog(parent)
 
 [wxID_CMSMAINDIALOG, wxID_CUSTMGMTBUTTON,
  wxID_NONCUSTMGMTBUTTON, wxID_PRODUCTMGMTBUTTON, 
- wxID_PURCHSEMGMTBUTTON, 
- wxID_FOLLOWUPBUTTON, wxID_EXITBUTTON,
- wxID_BITMAPCMSMAINPAGE,
- wxID_CMSMAINDIALOGWARNINGTEXT, wxID_CHANGEBUTTON,
-] = [wx.NewId() for _init_ctrls in range(10)]
+ wxID_PURCHSEMGMTBUTTON, wxID_FOLLOWUPBUTTON,
+ wxID_EXITBUTTON, wxID_BACKUPBUTTON,
+ wxID_BITMAPCMSMAINPAGE, wxID_CHANGEBUTTON,
+ wxID_CMSMAINDIALOGWARNINGTEXT,
+] = [wx.NewId() for _init_ctrls in range(11)]
 
 class CMSMainDialog(wx.Dialog):
-    def _init_ctrls(self, prnt, maintitle, custlabel, noncustlabel, productlabel, purchselabel, followlabel, exitlabel, changelabel):
+    def _init_ctrls(self, prnt, maintitle, custlabel, noncustlabel, productlabel, purchselabel, followlabel, backuplabel, exitlabel, changelabel):
         buttonsize = (300, 50)
         # generated method, don't edit
         wx.Dialog.__init__(self, id=wxID_CMSMAINDIALOG, name='CMSMainDialog',
@@ -46,7 +47,7 @@ class CMSMainDialog(wx.Dialog):
               False, u'新細明體'))
 
         ### 非會員資料
-        noncustpoint = (50, 110)
+        noncustpoint = (400, 30)
         self.NonCustMgmtButton = wx.Button(id=wxID_NONCUSTMGMTBUTTON, label=noncustlabel,
               name='NonCustMgmtButton', parent=self.CMSMainPage, pos=noncustpoint,
               size=buttonsize, style=wx.BU_LEFT)
@@ -54,7 +55,7 @@ class CMSMainDialog(wx.Dialog):
               False, u'新細明體'))
 
         ### 產品內容維護
-        prodpoint = (50, 190)
+        prodpoint = (50, 110)
         self.ProductMgmtButton = wx.Button(id=wxID_PRODUCTMGMTBUTTON, label=productlabel,
               name='ProductMgmtButton', parent=self.CMSMainPage, pos=prodpoint,
               size=buttonsize, style=wx.BU_LEFT)
@@ -62,7 +63,7 @@ class CMSMainDialog(wx.Dialog):
               False, u'新細明體'))
 
         ### 產品購買及消費查詢
-        purchsepoint = (50, 270)
+        purchsepoint = (400, 110)
         self.PurchseMgmtButton = wx.Button(id=wxID_PURCHSEMGMTBUTTON, label=purchselabel,
               name='PurchseMgmtButton', parent=self.CMSMainPage, pos=purchsepoint,
               size=buttonsize, style=wx.BU_LEFT)
@@ -70,11 +71,19 @@ class CMSMainDialog(wx.Dialog):
               False, u'新細明體'))
 
         ### 跟進內容
-        followpoint = (50, 350)
+        followpoint = (50, 190)
         self.FollowUpButton = wx.Button(id=wxID_FOLLOWUPBUTTON, label=followlabel,
               name='FollowUpButton', parent=self.CMSMainPage, pos=followpoint,
               size=buttonsize, style=wx.BU_LEFT)
         self.FollowUpButton.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
+              False, u'新細明體'))
+
+        ### 資料備份還原
+        backuppoint = (50,350)
+        self.BackupButton = wx.Button(id=wxID_BACKUPBUTTON, label=backuplabel,
+              name='BackupButton', parent=self.CMSMainPage, pos=backuppoint,
+              size=buttonsize, style=wx.BU_LEFT)
+        self.BackupButton.SetFont(wx.Font(14, wx.SWISS, wx.NORMAL, wx.BOLD,
               False, u'新細明體'))
 
         ### 離開
@@ -115,6 +124,7 @@ class CMSMainDialog(wx.Dialog):
         self.prodtable   = self.dbdata['PRODTABLE']
         self.saletable   = self.dbdata['SALETABLE']
         self.followtable = self.dbdata['FOLLOWTABLE']
+        self.backuptable = self.dbdata['BACKUPTABLE']
 
         self.imagedir        = self.imgdata['IMGDIR']
         self.mainpagefile    = self.imgdata['MAIN']['FILENAME']
@@ -127,6 +137,8 @@ class CMSMainDialog(wx.Dialog):
         self.producttitle   = u'產品維護'
         self.purchsetitle   = u'產品訂購及消費積分查詢'
         self.followtitle    = u'跟進內容'
+        self.backuptitle    = u'資料備份還原'
+        self.exittitle      = u'離開'
 
         maintitle      = u'客戶資料管理系統'
         custlabel      = u'  1. %s'%self.custtitle
@@ -134,7 +146,8 @@ class CMSMainDialog(wx.Dialog):
         productlabel   = u'  3. %s'%self.producttitle
         purchselabel   = u'  4. %s'%self.purchsetitle
         followlabel    = u'  5. %s'%self.followtitle
-        exitlabel      = u'  6. 離開'
+        backuplabel    = u'  A. %s'%self.backuptitle
+        exitlabel      = u'  0. %s'%self.exittitle
         changelabel    = u'變更底圖'
         self.warntext  = u'軟體版權為 陳智凱 所有，有著作權、侵害必究'
 
@@ -158,7 +171,7 @@ class CMSMainDialog(wx.Dialog):
         #print self.mainwin
 
         self._init_ctrls(parent, maintitle, custlabel, noncustlabel, productlabel,
-                         purchselabel, followlabel, exitlabel, changelabel)
+                         purchselabel, followlabel, backuplabel, exitlabel, changelabel)
         self.Center()
 
         self.Bind(wx.EVT_BUTTON, self.OnCustMgmtButton,    self.CustMgmtButton)
@@ -166,6 +179,7 @@ class CMSMainDialog(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnProductMgmtButton, self.ProductMgmtButton)
         self.Bind(wx.EVT_BUTTON, self.OnPurchseMgmtButton, self.PurchseMgmtButton)
         self.Bind(wx.EVT_BUTTON, self.OnFollowUpButton,    self.FollowUpButton)
+        self.Bind(wx.EVT_BUTTON, self.OnBackupButton,        self.BackupButton)
         self.Bind(wx.EVT_BUTTON, self.OnExitButton,        self.ExitButton)
         self.Bind(wx.EVT_BUTTON, self.OnChangeButton,      self.ChangeButton)
         self.SetEscapeId(wxID_EXITBUTTON)
@@ -218,6 +232,16 @@ class CMSMainDialog(wx.Dialog):
         dlg = FollowUpSystem.FollowUpSystem(self.followtitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
                                             self.bgimagesize, self.imagedir, self.imginfo, self.dbname, self.custtable, self.followtable,
                                             self.warntext)
+        dlg.SetIcon(wx.Icon(self.bgimagefile, self.bgimagetype))
+        try:
+            dlg.ShowModal()
+        finally:
+            dlg.Destroy()
+
+    def OnBackupButton(self, event):
+        dlg = DataBackupSystem.DataBackupSystem(self.backuptitle, self.parent, self.mainwin, self.bgimagefile, self.bgimage,
+                                                self.bgimagesize, self.imagedir, self.imginfo, self.dbname, self.backuptable,
+                                                self.workdir, self.warntext)
         dlg.SetIcon(wx.Icon(self.bgimagefile, self.bgimagetype))
         try:
             dlg.ShowModal()

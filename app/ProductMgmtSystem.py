@@ -129,7 +129,7 @@ class ProductMgmtSystem(wx.Dialog):
 
         self.allprodinfo = self.sysinfo.GetAllProductInfo(self.dbname, self.prodtable)
         #print self.allprodinfo
-        self.CreatHeader()
+        self.CreateHeader()
         self.InitData(self.membertype, self.allprodinfo)
 
     def OnNewProduct(self, event):
@@ -219,7 +219,7 @@ class ProductMgmtSystem(wx.Dialog):
         self.Close()
         event.Skip()
 
-    def CreatHeader(self):
+    def CreateHeader(self):
         #print 'Create list header'
         cid = 0
         for id in range(0, len(self.ProductHeaderList)):

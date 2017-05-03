@@ -126,6 +126,27 @@ class GetSysInfo:
 
         return yearlist, monthlist, daylist
 
+    def GetBackupTypeList(self):
+        backuptype = [u'請選擇備份方式', u'本機磁碟']
+        #[,
+        #              u'Google Drive', u'One Drive',
+        #              u'Dropbox']
+
+        return backuptype
+
+    def GetBackupHeaderList(self):
+        HeaderList = [u'備份型態', u'備份時間',
+                      u'檔案名稱', u'檔案大小',
+                      u'備註']
+        HeaderId    = {}
+        HeaderId[0] = 120
+        HeaderId[1] = 150
+        HeaderId[2] = 400
+        HeaderId[3] = 100
+        HeaderId[4] = 150
+
+        return HeaderList, HeaderId
+
     def GetAllUserInfo(self, dbname, membertype, custtable, queryjoblist, searchname):
         alluserinfo = []
         sqlaction = 'select'
@@ -160,7 +181,7 @@ class GetSysInfo:
             #print 'Query user info:  '
             #print alluserinfo
         except:
-            print 'Query database error'
+            print 'Access database error %s'%sqlacion
             print sqlcmd
             info = 'error'
         
@@ -179,7 +200,7 @@ class GetSysInfo:
             #print 'Query user info:  '
             #print allprodinfo
         except:
-            print 'Query database error'
+            print 'Access database error %s'%sqlacion
             print sqlcmd
             info = 'error'
         
@@ -203,7 +224,7 @@ class GetSysInfo:
             #print 'Query user info:  '
             #print alluserinfo
         except:
-            print 'Query database error'
+            print 'Access database error %s'%sqlacion
             print sqlcmd
             info = 'error'
         

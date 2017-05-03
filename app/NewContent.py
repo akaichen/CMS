@@ -226,7 +226,7 @@ class NewContent(wx.Dialog):
             db = ConnectDB.ConnectDB(self.dbname, sqlaction, sqlcmd)
             info = db.ConnectDB()
         except:
-            print 'Insert into database error'
+            print 'Access database error %s'%sqlacion
             print sqlcmd
             info = 'error'
 
